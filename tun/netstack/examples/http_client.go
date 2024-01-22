@@ -13,9 +13,9 @@ import (
 	"net/http"
 	"net/netip"
 
-	"github.com/bepass-org/wireguard-go/conn"
-	"github.com/bepass-org/wireguard-go/device"
-	"github.com/bepass-org/wireguard-go/tun/netstack"
+	"github.com/uoosef/wireguard-go/conn"
+	"github.com/uoosef/wireguard-go/device"
+	"github.com/uoosef/wireguard-go/tun/netstack"
 )
 
 func main() {

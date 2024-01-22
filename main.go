@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/bepass-org/wireguard-go/device"
-	"github.com/bepass-org/wireguard-go/warp"
-	"github.com/bepass-org/wireguard-go/wiresocks"
+	"github.com/uoosef/wireguard-go/device"
+	"github.com/uoosef/wireguard-go/warp"
+	"github.com/uoosef/wireguard-go/wiresocks"
 	"log"
 )
 

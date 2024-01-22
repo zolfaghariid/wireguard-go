@@ -7,7 +7,7 @@
 
 package device
 
-import "github.com/bepass-org/wireguard-go/conn"
+import "github.com/uoosef/wireguard-go/conn"
 
 const (
 	QueueStagedSize            = conn.IdealBatchSize

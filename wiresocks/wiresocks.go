@@ -7,9 +7,9 @@ import (
 	"net/netip"
 
 	"github.com/MakeNowJust/heredoc/v2"
-	"github.com/bepass-org/wireguard-go/conn"
-	"github.com/bepass-org/wireguard-go/device"
-	"github.com/bepass-org/wireguard-go/tun/netstack"
+	"github.com/uoosef/wireguard-go/conn"
+	"github.com/uoosef/wireguard-go/device"
+	"github.com/uoosef/wireguard-go/tun/netstack"
 )
 
 // DeviceSetting contains the parameters for setting up a tun interface
