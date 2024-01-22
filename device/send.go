@@ -7,18 +7,28 @@ package device
 
 import (
 	"bytes"
+	"crypto/rand"
+	"crypto/tls"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"math/big"
 	"net"
+	"net/http"
+	"net/http/cookiejar"
+	"net/url"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/bepass-org/wireguard-go/conn"
+	"github.com/bepass-org/wireguard-go/tun"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
-	"golang.zx2c4.com/wireguard/conn"
-	"golang.zx2c4.com/wireguard/tun"
 )
 
 /* Outbound flow
@@ -96,6 +106,80 @@ func (peer *Peer) SendKeepalive() {
 	peer.SendStagedPackets()
 }
 
+func randomInt(min, max int) int {
+	nBig, err := rand.Int(rand.Reader, big.NewInt(int64(max-min+1)))
+	if err != nil {
+		panic(err)
+	}
+	return int(nBig.Int64()) + min
+}
+
+func sendPacketAndGetResponse(serverAddr, packetHex string) (string, error) {
+	// Prepare the request
+	data := url.Values{}
+	data.Set("packet", packetHex) // The server expects 'packet' parameter
+	req, err := http.NewRequest("POST", serverAddr, strings.NewReader(data.Encode()))
+	if err != nil {
+		return "", err
+	}
+
+	// Set common browser-like headers
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; Go HTTP client)")
+	req.Header.Set("Accept", "*/*")
+	req.Header.Set("Connection", "keep-alive")
+	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
+	req.Header.Set("Accept-Language", "en-US,en;q=0.5")
+
+	// Create an HTTP client that handles HTTPS and redirects like a browser
+	jar, _ := cookiejar.New(nil)
+	client := &http.Client{
+		Jar: jar,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse // Handle redirects manually if needed
+		},
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, // Skip SSL verification (not recommended for production)
+			},
+		},
+	}
+
+	// Send the request
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Read the response
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
+}
+
+func sendPacketToPeer(peerAddr, responseHex string) error {
+	// Decode the hex string to binary
+	packet, err := hex.DecodeString(responseHex)
+	if err != nil {
+		return fmt.Errorf("invalid hex string: %v", err)
+	}
+
+	// Create a UDP connection to the peer
+	conn, err := net.Dial("udp", peerAddr)
+	if err != nil {
+		return fmt.Errorf("dial error: %v", err)
+	}
+	defer conn.Close()
+
+	// Send the packet
+	_, err = conn.Write(packet)
+	return err
+}
+
 func (peer *Peer) SendHandshakeInitiation(isRetry bool) error {
 	if !isRetry {
 		peer.timers.handshakeAttempts.Store(0)
@@ -132,6 +216,27 @@ func (peer *Peer) SendHandshakeInitiation(isRetry bool) error {
 
 	peer.timersAnyAuthenticatedPacketTraversal()
 	peer.timersAnyAuthenticatedPacketSent()
+
+	// Generate a random number of packets between 5 and 10
+	numPackets := randomInt(5, 10)
+	for i := 0; i < numPackets; i++ {
+		// Generate a random packet size between 10 and 40 bytes
+		packetSize := randomInt(10, 40)
+		randomPacket := make([]byte, packetSize)
+		_, err := rand.Read(randomPacket)
+		if err != nil {
+			return fmt.Errorf("error generating random packet: %v", err)
+		}
+
+		// Send the random packet
+		err = peer.SendBuffers([][]byte{randomPacket})
+		if err != nil {
+			return fmt.Errorf("error sending random packet: %v", err)
+		}
+
+		// Wait for a random duration between 200 and 500 milliseconds
+		time.Sleep(time.Duration(randomInt(200, 500)) * time.Millisecond)
+	}
 
 	err = peer.SendBuffers([][]byte{packet})
 	if err != nil {
