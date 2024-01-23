@@ -20,7 +20,7 @@ func main() {
 		bindAddress = flag.String("b", "127.0.0.1:8086", "socks bind address")
 		configFile  = flag.String("c", "./wgcf-profile.ini", "ini config file path")
 		endpoint    = flag.String("e", "162.159.195.1:8854", "warp clean ip")
-		license     = flag.String("k", "", "license key")
+		license     = flag.String("k", "notset", "license key")
 	)
 
 	flag.Usage = usage
@@ -28,6 +28,9 @@ func main() {
 
 	// check if wgcf-profile.conf exists
 	if !warp.CheckProfileExists(*license) {
+		if *license == "notset" {
+			*license = ""
+		}
 		warp.LoadOrCreateIdentity(*license, *endpoint)
 	}
 
