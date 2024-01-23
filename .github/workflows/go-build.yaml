@@ -139,7 +139,7 @@ jobs:
       - name: Build Mips softfloat warp
         if: matrix.goarch == 'mips' || matrix.goarch == 'mipsle'
         run: |
-          GOMIPS=softfloat go build -v -o build_assets/warp_softfloat -trimpath -ldflags "-s -w -buildid=" ./cmd/cli
+          GOMIPS=softfloat go build -v -o build_assets/warp_softfloat -trimpath -ldflags "-s -w -buildid=" ./main.go
 
       - name: Rename Windows warp
         if: matrix.goos == 'windows'
