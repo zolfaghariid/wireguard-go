@@ -48,12 +48,12 @@ install() {
 socks() {
    echo ""
    echo -e "${yellow}Copy this Config to ${purple}V2ray${green} Or ${purple}Nekobox ${yellow}and Exclude Termux${rest}"
-   echo -e "${yellow} Exclude Termux in apps settings${rest}"
    echo "================================================"
    echo -e "${green}socks://==@127.0.0.1:8086#8086#(usef)${rest}"
    echo "or"
    echo -e "${green}Manually create a SOCKS configuration with IP ${pirple}127.0.0.1 ${green}and port${pirple} 8086..${rest}"
    echo "================================================"
+   echo -e "${yellow} Exclude Termux in apps settings${rest}"
    echo -e "${yellow}To run again, type:${green} warp ${rest}or${green} usef ${rest}"
    echo "================================================"
    echo ""
