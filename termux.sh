@@ -51,7 +51,7 @@ socks() {
    echo "================================================"
    echo -e "${green}socks://Og==@127.0.0.1:8086#warp_(usef)${rest}"
    echo "or"
-   echo -e "${green}Manually create a SOCKS configuration with IP ${pirple}127.0.0.1 ${green}and port${pirple} 8086..${rest}"
+   echo -e "${green}Manually create a SOCKS configuration with IP ${purple}127.0.0.1 ${green}and port${purple} 8086..${rest}"
    echo "================================================"
    echo -e "${yellow}To run again, type:${green} warp ${rest}or${green} usef ${rest}"
    echo "================================================"
