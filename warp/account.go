@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -557,6 +558,31 @@ func LoadOrCreateIdentity(license string, endpoint string) {
 
 func CheckProfileExists(license string) bool {
 	if _, err := os.Stat(profileFile); os.IsNotExist(err) {
+		return false
+	}
+	ad := &AccountData{} // Read errors caught by unmarshal
+	fileBytes, _ := os.ReadFile(identityFile)
+	err := json.Unmarshal(fileBytes, ad)
+	if err != nil {
+		e := os.Remove(profileFile)
+		if e != nil {
+			log.Fatal(e)
+		}
+		e = os.Remove(identityFile)
+		if e != nil {
+			log.Fatal(e)
+		}
+		return false
+	}
+	if ad.LicenseKey != license {
+		e := os.Remove(profileFile)
+		if e != nil {
+			log.Fatal(e)
+		}
+		e = os.Remove(identityFile)
+		if e != nil {
+			log.Fatal(e)
+		}
 		return false
 	}
 	return true
