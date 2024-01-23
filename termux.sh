@@ -51,7 +51,7 @@ socks() {
    echo "================================================"
    echo -e "${green}socks://Og==@127.0.0.1:8086#Free Warp %28usef%29${rest}"
    echo "================================================"
-   echo -e "${yellow}To run again, type:${green} warp or usef ${rest}"
+   echo -e "${yellow}To run again, type:${green} warp ${rest}or${green} usef ${rest}"
    echo ""
 }
 
