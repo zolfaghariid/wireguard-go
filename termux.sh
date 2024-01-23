@@ -48,6 +48,7 @@ install() {
 socks() {
    echo ""
    echo -e "${yellow}Copy this Config to ${purple}V2ray${green} Or ${purple}Nekobox ${yellow}and Exclude Termux${rest}"
+   echo -e "${yellow} Exclude Termux in apps settings${rest}"
    echo "================================================"
    echo -e "${green}socks://Og==@127.0.0.1:8086#Free Warp %28usef%29${rest}"
    echo "================================================"
