@@ -59,7 +59,7 @@ socks() {
 uninstall() {
     directory="/data/data/com.termux/files/home/wireguard-go"
     if [ -d "$directory" ]; then
-        rm -rf "$directory" "$PREFIX/bin/usef" "$PREFIX/bin/warp"
+        rm -rf "$directory" "$PREFIX/bin/usef" "$PREFIX/bin/warp" "~/wgcf-profile.ini" "~/wgcf-identity.json" > /dev/null 2>&1
         echo -e "${red}Uninstallation completed.${rest}"
     else
         echo -e "${yellow} ____________________________________${rest}"
