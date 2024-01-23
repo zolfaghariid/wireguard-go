@@ -24,6 +24,12 @@ To run with more logging you may set the environment variable `LOG_LEVEL=debug`.
 
 ## Platforms
 
+### Termux
+
+```
+bash <(curl -fsSL https://raw.githubusercontent.com/Ptechgithub/wireguard-go/main/termux.sh)
+```
+
 ### Linux
 
 This will run on Linux; however you should instead use the kernel module, which is faster and better integrated into the OS. See the [installation page](https://www.wireguard.com/install/) for instructions.
