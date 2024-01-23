@@ -574,7 +574,7 @@ func CheckProfileExists(license string) bool {
 		}
 		return false
 	}
-	if ad.LicenseKey != license {
+	if license != "notset" && ad.LicenseKey != license {
 		e := os.Remove(profileFile)
 		if e != nil {
 			log.Fatal(e)
