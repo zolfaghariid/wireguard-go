@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#colors
+# Colors
 red='\033[0;31m'
 green='\033[0;32m'
 yellow='\033[0;33m'
@@ -9,7 +9,7 @@ purple='\033[0;35m'
 cyan='\033[0;36m'
 rest='\033[0m'
 
-#check_dependencies
+# Check Dependencies
 check_dependencies() {
     local dependencies=("curl" "git" "golang")
 
@@ -21,28 +21,26 @@ check_dependencies() {
     done
 }
 
-# Install Function
+# Install WireGuard VPN (warp)
 install() {
-    if ! command -v warp &> /dev/null && ! command -v usef &> /dev/null; then
-        echo -e "${green}Installing WireGuard VPN (warp)...${rest}"
-        pkg update -y && pkg upgrade -y
-        check_dependencies
-
-        if git clone https://github.com/uoosef/wireguard-go.git; then
-            cd wireguard-go || exit
-            if go build main.go; then
-                chmod +x main
-                cp main "$PREFIX/bin/usef"
-                cp main "$PREFIX/bin/warp"
-                echo -e "${green}Warp installed successfully.${rest}"
-            else
-                echo -e "${red}Error building main.go.${rest}"
-            fi
-        else
-            echo -e "${red}Error cloning WireGuard repository.${rest}"
-        fi
-    else
+    if command -v warp &> /dev/null || command -v usef &> /dev/null; then
         echo -e "${green}Warp is already installed.${rest}"
+        return
+    fi
+
+    echo -e "${green}Installing WireGuard VPN (warp)...${rest}"
+    pkg update -y && pkg upgrade -y
+    check_dependencies
+
+    if git clone https://github.com/uoosef/wireguard-go.git &&
+        cd wireguard-go &&
+        go build main.go &&
+        chmod +x main &&
+        cp main "$PREFIX/bin/usef" &&
+        cp main "$PREFIX/bin/warp"; then
+        echo -e "${green}Warp installed successfully.${rest}"
+    else
+        echo -e "${red}Error installing WireGuard VPN.${rest}"
     fi
 }
 
@@ -53,7 +51,7 @@ socks() {
    echo "================================================"
    echo -e "${green}socks://Og==@127.0.0.1:8086#Free Warp %28usef%29${rest}"
    echo "================================================"
-   echo -e"${yellow}for run again you only need to type:${green} warp or usef ${rest}"
+   echo -e "${yellow}To run again, type:${green} warp or usef ${rest}"
    echo ""
 }
 
@@ -61,8 +59,7 @@ socks() {
 uninstall() {
     directory="/data/data/com.termux/files/home/wireguard-go"
     if [ -d "$directory" ]; then
-        rm -rf "$directory"
-        rm "$PREFIX/bin/usef" "$PREFIX/bin/warp" 
+        rm -rf "$directory" "$PREFIX/bin/usef" "$PREFIX/bin/warp"
         echo -e "${red}Uninstallation completed.${rest}"
     else
         echo -e "${yellow} ____________________________________${rest}"
@@ -71,20 +68,25 @@ uninstall() {
     fi
 }
 
-#menu
-clear
-echo -e "${green}By --> Peyman * Github.com/Ptechgithub * ${rest}"
-echo ""
-echo -e "${yellow}❤️Github.com/${cyan}uoosef${yellow}/wireguard-go❤️${rest}"
-echo -e "${purple}*********************************${rest}"
-echo -e "${blue}     ###${cyan} Warp in Termux ${blue}###${rest}   ${purple}  * ${rest}"
-echo -e "${purple}*********************************${rest}"
-echo -e "${cyan}1)${rest} ${green}Install WireGuard VPN (warp)${purple} * ${rest}"
-echo -e "                              ${purple}  * ${rest}"
-echo -e "${cyan}2)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
-echo -e "                              ${purple}  * ${rest}"
-echo -e "${red}0)${rest} ${green}Exit                         ${purple}* ${rest}"
-echo -e "${purple}*********************************${rest}"
+# Menu
+menu() {
+    clear
+    echo -e "${green}By --> Peyman * Github.com/Ptechgithub * ${rest}"
+    echo ""
+    echo -e "${yellow}❤️Github.com/${cyan}uoosef${yellow}/wireguard-go❤️${rest}"
+    echo -e "${purple}*********************************${rest}"
+    echo -e "${blue}     ###${cyan} Warp in Termux ${blue}###${rest}   ${purple}  * ${rest}"
+    echo -e "${purple}*********************************${rest}"
+    echo -e "${cyan}1)${rest} ${green}Install WireGuard VPN (warp)${purple} * ${rest}"
+    echo -e "                              ${purple}  * ${rest}"
+    echo -e "${cyan}2)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
+    echo -e "                              ${purple}  * ${rest}"
+    echo -e "${red}0)${rest} ${green}Exit                         ${purple}* ${rest}"
+    echo -e "${purple}*********************************${rest}"
+}
+
+# Main
+menu
 read -p "Please enter your selection [1-2]:" choice
 
 case "$choice" in
