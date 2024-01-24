@@ -21,8 +21,8 @@ check_dependencies() {
     done
 }
 
-# Install WireGuard VPN (warp)
-install() {
+# Build
+build() {
     if command -v warp &> /dev/null || command -v usef &> /dev/null; then
         echo -e "${green}Warp is already installed.${rest}"
         return
@@ -44,6 +44,29 @@ install() {
     fi
 }
 
+# Install
+install() {
+    if command -v warp &> /dev/null || command -v usef &> /dev/null; then
+        echo -e "${green}Warp is already installed.${rest}"
+        return
+    fi
+
+    echo -e "${green}Installing Warp...${rest}"
+    pkg update -y && pkg upgrade -y
+    check_dependencies
+
+    if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.2-alpha/warp-android-arm64.02bb9b.zip &&
+        unzip warp-android-arm64.02bb9b.zip &&
+        chmod +x warp &&
+        cp warp "$PREFIX/bin/usef" &&
+        cp warp "$PREFIX/bin/warp"; then
+        rm "README.md" "LICENSE" "warp-android-arm64.02bb9b.zip"
+        echo -e "${green}Warp installed successfully.${rest}"
+    else
+        echo -e "${red}Error installing Warp.${rest}"
+    fi
+}
+
 # Get socks config
 socks() {
    echo ""
@@ -60,9 +83,10 @@ socks() {
 
 #Uninstall
 uninstall() {
+    warp="$PREFIX/bin/warp"
     directory="/data/data/com.termux/files/home/wireguard-go"
     home="/data/data/com.termux/files/home"
-    if [ -d "$directory" ]; then
+    if [ -d "$warp" ]; then
         rm -rf "$directory" "$PREFIX/bin/usef" "$PREFIX/bin/warp" "$home/wgcf-profile.ini" "$home/wgcf-identity.json" > /dev/null 2>&1
         echo -e "${red}Uninstallation completed.${rest}"
     else
@@ -81,9 +105,11 @@ menu() {
     echo -e "${purple}*********************************${rest}"
     echo -e "${blue}     ###${cyan} Warp in Termux ${blue}###${rest}   ${purple}  * ${rest}"
     echo -e "${purple}*********************************${rest}"
-    echo -e "${cyan}1)${rest} ${green}Install WireGuard VPN (warp)${purple} * ${rest}"
+    echo -e "${cyan}1)${rest} ${green}Install Warp (vpn)${purple}           * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${cyan}2)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
+    echo -e "                              ${purple}  * ${rest}"
+    echo -e "${cyan}3)${rest} ${green}Build (warp)${purple}                 * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${red}0)${rest} ${green}Exit                         ${purple}* ${rest}"
     echo -e "${purple}*********************************${rest}"
@@ -101,6 +127,9 @@ case "$choice" in
         ;;
     2)
         uninstall
+        ;;
+    3)
+        build
         ;;
     0)
         echo -e "${cyan}Exiting...${rest}"
