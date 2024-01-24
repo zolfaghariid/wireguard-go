@@ -40,7 +40,7 @@ build() {
         return
     fi
 
-    echo -e "${green}Installing WireGuard VPN (warp)...${rest}"
+    echo -e "${green}Installing Warp...${rest}"
     pkg update -y && pkg upgrade -y
     check_dependencies_build
 
