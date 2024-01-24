@@ -32,6 +32,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Ptechgithub/wireguard-go/mas
 ![1](https://github.com/Ptechgithub/configs/blob/main/media/18.jpg?raw=true)
 
 - بعد از نصب برای اجرای مجدد فقط کافیه که warp یا usef را وارد کنید. 
+- برای نمایش راهنما ` warp -h` را وارد کنید. 
 ### Linux
 
 This will run on Linux; however you should instead use the kernel module, which is faster and better integrated into the OS. See the [installation page](https://www.wireguard.com/install/) for instructions.
