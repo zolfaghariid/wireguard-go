@@ -33,7 +33,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Ptechgithub/wireguard-go/mas
 
 - بعد از نصب برای اجرای مجدد فقط کافیه که warp یا usef را وارد کنید. 
 - برای نمایش راهنما ` warp -h` را وارد کنید. 
-- ای پی و پورت `127.0.0.1:8086`
+- ای پی و پورت `127.0.0.1:8086`پروتکل socks
 ### Linux
 
 This will run on Linux; however you should instead use the kernel module, which is faster and better integrated into the OS. See the [installation page](https://www.wireguard.com/install/) for instructions.
