@@ -9,9 +9,21 @@ purple='\033[0;35m'
 cyan='\033[0;36m'
 rest='\033[0m'
 
+# Check Dependencies build
+check_dependencies_build() {
+    local dependencies=("curl" "git" "golang")
+
+    for dep in "${dependencies[@]}"; do
+        if ! dpkg -s "${dep}" &> /dev/null; then
+            echo -e "${yellow}${dep} is not installed. Installing...${rest}"
+            pkg install "${dep}" -y
+        fi
+    done
+}
+
 # Check Dependencies
 check_dependencies() {
-    local dependencies=("curl" "git" "golang")
+    local dependencies=("curl" "wget" "unzip")
 
     for dep in "${dependencies[@]}"; do
         if ! dpkg -s "${dep}" &> /dev/null; then
@@ -30,7 +42,7 @@ build() {
 
     echo -e "${green}Installing WireGuard VPN (warp)...${rest}"
     pkg update -y && pkg upgrade -y
-    check_dependencies
+    check_dependencies_build
 
     if git clone https://github.com/uoosef/wireguard-go.git &&
         cd wireguard-go &&
