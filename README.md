@@ -29,6 +29,7 @@ To run with more logging you may set the environment variable `LOG_LEVEL=debug`.
 ```
 bash <(curl -fsSL https://raw.githubusercontent.com/Ptechgithub/wireguard-go/master/termux.sh)
 ```
+![1](https://github.com/Ptechgithub/configs/blob/main/media/18.jpg?raw=true)
 
 ### Linux
 
