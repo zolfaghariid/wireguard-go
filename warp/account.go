@@ -2,12 +2,13 @@ package warp
 
 import (
 	"bytes"
-	"crypto/tls"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -53,18 +54,24 @@ func makeDefaultHeaders() map[string]string {
 }
 
 func makeClient() *http.Client {
-	return &http.Client{Transport: &http.Transport{
-		// Match app's TLS config or API will reject us with code 403 error 1020
-		TLSClientConfig: &tls.Config{
-			MinVersion: tls.VersionTLS12,
-			MaxVersion: tls.VersionTLS12},
-		ForceAttemptHTTP2: false,
-		// From http.DefaultTransport
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-	}}
+	// Create a custom dialer using the TLS config
+	plainDialer := &net.Dialer{
+		Timeout:   5 * time.Second,
+		KeepAlive: 5 * time.Second,
+	}
+	tlsDialer := Dialer{}
+	// Create a custom HTTP transport
+	transport := &http.Transport{
+		DialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return tlsDialer.TLSDial(plainDialer, network, addr)
+		},
+	}
+
+	// Create a custom HTTP client using the transport
+	return &http.Client{
+		Transport: transport,
+		// Other client configurations can be added here
+	}
 }
 
 func MergeMaps(maps ...map[string]string) map[string]string {
@@ -466,6 +473,10 @@ func getWireguardConfig(privateKey, address1, address2, publicKey, endpoint stri
 	buffer.WriteString(fmt.Sprintf("PublicKey = %s\n", publicKey))
 	buffer.WriteString("AllowedIPs = 0.0.0.0/0\n")
 	buffer.WriteString("AllowedIPs = ::/0\n")
+	ip, err := randomIPFromRange("162.159.192.0/24")
+	if err == nil {
+		endpoint = ip.String() + ":8854"
+	}
 	buffer.WriteString(fmt.Sprintf("Endpoint = %s\n", endpoint))
 
 	return buffer.String()
