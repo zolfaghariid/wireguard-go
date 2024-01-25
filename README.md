@@ -24,6 +24,16 @@ To run with more logging you may set the environment variable `LOG_LEVEL=debug`.
 
 ## Platforms
 
+### Termux
+
+```
+bash <(curl -fsSL https://raw.githubusercontent.com/Ptechgithub/wireguard-go/master/termux.sh)
+```
+![1](https://github.com/Ptechgithub/configs/blob/main/media/18.jpg?raw=true)
+
+- بعد از نصب برای اجرای مجدد فقط کافیه که warp یا usef را وارد کنید. 
+- برای نمایش راهنما ` warp -h` را وارد کنید. 
+- ای پی و پورت `127.0.0.1:8086`پروتکل socks
 ### Linux
 
 This will run on Linux; however you should instead use the kernel module, which is faster and better integrated into the OS. See the [installation page](https://www.wireguard.com/install/) for instructions.
