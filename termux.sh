@@ -67,7 +67,7 @@ install() {
     pkg update -y && pkg upgrade -y
     check_dependencies
 
-    if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.2-alpha/warp-android-arm64.02bb9b.zip &&
+    if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.3-alpha/warp-android-arm64.3410f4.zip &&
         unzip warp-android-arm64.02bb9b.zip &&
         chmod +x warp &&
         cp warp "$PREFIX/bin/usef" &&
