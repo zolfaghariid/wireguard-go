@@ -172,7 +172,7 @@ menu() {
 
 # Main
 menu
-read -p "Please enter your selection [0-4]:" choice
+read -p "Please enter your selection [0-5]:" choice
 
 case "$choice" in
    1)
