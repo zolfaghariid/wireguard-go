@@ -73,6 +73,7 @@ install() {
         cp warp "$PREFIX/bin/usef" &&
         cp warp "$PREFIX/bin/warp"; then
         rm "README.md" "LICENSE" "warp-android-arm64.02bb9b.zip"
+        echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
     else
         echo -e "${red}Error installing Warp.${rest}"
