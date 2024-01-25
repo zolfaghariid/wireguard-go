@@ -75,6 +75,7 @@ install() {
         rm "README.md" "LICENSE" "warp-android-arm64.3410f4.zip"
         echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
+        socks
     else
         echo -e "${red}Error installing Warp.${rest}"
     fi
@@ -149,7 +150,6 @@ read -p "Please enter your selection [0-4]:" choice
 case "$choice" in
    1)
         install
-        socks
         warp
         ;;
     2)
