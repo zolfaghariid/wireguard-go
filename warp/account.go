@@ -562,34 +562,41 @@ func LoadOrCreateIdentity(license string, endpoint string) error {
 	return nil
 }
 
-func CheckProfileExists(license string) bool {
-	if _, err := os.Stat(profileFile); os.IsNotExist(err) {
-		return false
-	}
-	ad := &AccountData{} // Read errors caught by unmarshal
-	fileBytes, _ := os.ReadFile(identityFile)
-	err := json.Unmarshal(fileBytes, ad)
-	if err != nil {
-		e := os.Remove(profileFile)
-		if e != nil {
-			log.Fatal(e)
-		}
-		e = os.Remove(identityFile)
-		if e != nil {
-			log.Fatal(e)
-		}
-		return false
-	}
-	if license != "notset" && ad.LicenseKey != license {
-		e := os.Remove(profileFile)
-		if e != nil {
-			log.Fatal(e)
-		}
-		e = os.Remove(identityFile)
-		if e != nil {
-			log.Fatal(e)
-		}
+func fileExist(f string) bool {
+	if _, err := os.Stat(f); os.IsNotExist(err) {
 		return false
 	}
 	return true
+}
+func removeFile(f string) {
+	if fileExist(f) {
+		e := os.Remove(f)
+		if e != nil {
+			log.Fatal(e)
+		}
+	} else {
+		log.Printf("file %s is not exist!", f)
+	}
+}
+func CheckProfileExists(license string) bool {
+	isOk := true
+	if !fileExist(identityFile) || !fileExist(profileFile) {
+		isOk = false
+	}
+
+	ad := &AccountData{} // Read errors caught by unmarshal
+	if isOk {
+		fileBytes, _ := os.ReadFile(identityFile)
+		err := json.Unmarshal(fileBytes, ad)
+		if err != nil {
+			isOk = false
+		} else if license != "notset" && ad.LicenseKey != license {
+			isOk = false
+		}
+	}
+	if !isOk {
+		removeFile(profileFile)
+		removeFile(identityFile)
+	}
+	return isOk
 }
