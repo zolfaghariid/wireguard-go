@@ -89,7 +89,7 @@ socks() {
    echo "or"
    echo -e "${green}Manually create a SOCKS configuration with IP ${purple}127.0.0.1 ${green}and port${purple} 8086..${rest}"
    echo "================================================"
-   echo -e "${yellow}To run again, type:${green} warp ${rest}or${green} usef ${rest}"
+   echo -e "${yellow}To run again, type:${green} warp ${rest}or${green} usef ${rest}or${green} ./warp${rest}"
    echo "================================================"
    echo ""
 }
