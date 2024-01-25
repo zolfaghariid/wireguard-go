@@ -3,10 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/uoosef/wireguard-go/device"
 	"github.com/uoosef/wireguard-go/warp"
 	"github.com/uoosef/wireguard-go/wiresocks"
-	"log"
 )
 
 func usage() {
@@ -31,7 +33,11 @@ func main() {
 		if *license == "notset" {
 			*license = ""
 		}
-		warp.LoadOrCreateIdentity(*license, *endpoint)
+		err := warp.LoadOrCreateIdentity(*license, *endpoint)
+		if err != nil {
+			fmt.Printf("error: %v", err)
+			os.Exit(2)
+		}
 	}
 
 	conf, err := wiresocks.ParseConfig(*configFile)
