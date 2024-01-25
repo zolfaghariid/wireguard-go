@@ -134,7 +134,7 @@ menu() {
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${cyan}2)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
-    echo -e "${cyan}3)${rest} ${green}Warp to ${purple}Warp plus${green} [Free GB]${rest}${purple} * ${rest}"
+    echo -e "${cyan}3)${rest} ${green}Warp to ${purple}Warp plus${green} [Free GB]${rest}${purple}  * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${cyan}4)${rest} ${green}Build (warp)${purple}                 * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
