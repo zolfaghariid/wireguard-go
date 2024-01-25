@@ -98,7 +98,7 @@ uninstall() {
     warp="$PREFIX/bin/warp"
     directory="/data/data/com.termux/files/home/wireguard-go"
     home="/data/data/com.termux/files/home"
-    if [ -d "$warp" ]; then
+    if [ -f "$warp" ]; then
         rm -rf "$directory" "$PREFIX/bin/usef" "$PREFIX/bin/warp" "$home/wgcf-profile.ini" "$home/wgcf-identity.json" > /dev/null 2>&1
         echo -e "${red}Uninstallation completed.${rest}"
     else
