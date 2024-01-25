@@ -68,11 +68,11 @@ install() {
     check_dependencies
 
     if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.3-alpha/warp-android-arm64.3410f4.zip &&
-        unzip warp-android-arm64.02bb9b.zip &&
+        unzip warp-android-arm64.3410f4.zip &&
         chmod +x warp &&
         cp warp "$PREFIX/bin/usef" &&
         cp warp "$PREFIX/bin/warp"; then
-        rm "README.md" "LICENSE" "warp-android-arm64.02bb9b.zip"
+        rm "README.md" "LICENSE" "warp-android-arm64.3410f4.zip"
         echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
     else
