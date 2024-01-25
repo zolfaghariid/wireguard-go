@@ -81,6 +81,31 @@ install() {
     fi
 }
 
+# arm 64 (old phone)
+install_old() {
+    if command -v warp &> /dev/null || command -v usef &> /dev/null; then
+        echo -e "${green}Warp is already installed.${rest}"
+        return
+    fi
+
+    echo -e "${green}Installing Warp...${rest}"
+    pkg update -y && pkg upgrade -y
+    check_dependencies
+
+    if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.3-alpha/warp-linux-arm64.3410f4.zip &&
+        unzip warp-linux-arm64.3410f4.zip &&
+        chmod +x warp &&
+        cp warp "$PREFIX/bin/usef" &&
+        cp warp "$PREFIX/bin/warp"; then
+        rm "README.md" "LICENSE" "warp-linux-arm64.3410f4.zip"
+        echo "================================================"
+        echo -e "${green}Warp installed successfully.${rest}"
+        socks
+    else
+        echo -e "${red}Error installing Warp.${rest}"
+    fi
+}
+
 # Get socks config
 socks() {
    echo ""
@@ -133,11 +158,13 @@ menu() {
     echo -e "${purple}*********************************${rest}"
     echo -e "${cyan}1)${rest} ${green}Install Warp (vpn)${purple}           * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
-    echo -e "${cyan}2)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
+    echo -e "${cyan}2)${rest} ${green}Install Warp (vpn) ${purple}${yellow}[arm 64] ${purple} * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
-    echo -e "${cyan}3)${rest} ${green}Warp to ${purple}Warp plus${green} [Free GB]${rest}${purple}  * ${rest}"
+    echo -e "${cyan}3)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
-    echo -e "${cyan}4)${rest} ${green}Build (warp)${purple}                 * ${rest}"
+    echo -e "${cyan}4)${rest} ${green}Warp to ${purple}Warp plus${green} [Free GB]${rest}${purple}  * ${rest}"
+    echo -e "                              ${purple}  * ${rest}"
+    echo -e "${cyan}5)${rest} ${green}Build (warp)${purple}                 * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${red}0)${rest} ${green}Exit                         ${purple}* ${rest}"
     echo -e "${purple}*********************************${rest}"
@@ -151,6 +178,9 @@ case "$choice" in
    1)
         install
         warp
+        ;;
+    2)
+        install_old
         ;;
     2)
         uninstall
