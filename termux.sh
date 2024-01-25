@@ -23,7 +23,7 @@ check_dependencies_build() {
 
 # Check Dependencies
 check_dependencies() {
-    local dependencies=("curl" "wget" "unzip")
+    local dependencies=("curl" "openssl-tool" "wget" "unzip")
 
     for dep in "${dependencies[@]}"; do
         if ! dpkg -s "${dep}" &> /dev/null; then
