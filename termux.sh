@@ -11,7 +11,7 @@ rest='\033[0m'
 
 # Check Dependencies build
 check_dependencies_build() {
-    local dependencies=("curl" "git" "golang")
+    local dependencies=("curl" "wget" "git" "golang")
 
     for dep in "${dependencies[@]}"; do
         if ! dpkg -s "${dep}" &> /dev/null; then
@@ -109,6 +109,18 @@ uninstall() {
     fi
 }
 
+# Warp to Warp plus
+warp_plus() {
+    if ! command -v python &> /dev/null; then
+        echo "Installing Python..."
+        pkg install python -y
+    fi
+
+    echo -e "${green}Downloading and running${purple} Warp+ script...${rest}"
+    wget -O wa.py https://raw.githubusercontent.com/Ptechgithub/configs/main/wa.py
+    python wa.py
+}
+
 # Menu
 menu() {
     clear
@@ -122,7 +134,9 @@ menu() {
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${cyan}2)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
-    echo -e "${cyan}3)${rest} ${green}Build (warp)${purple}                 * ${rest}"
+    echo -e "${cyan}3)${rest} ${green}Warp to ${purple}Warp plus${green} [Free GB]${rest}${purple} * ${rest}"
+    echo -e "                              ${purple}  * ${rest}"
+    echo -e "${cyan}4)${rest} ${green}Build (warp)${purple}                 * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${red}0)${rest} ${green}Exit                         ${purple}* ${rest}"
     echo -e "${purple}*********************************${rest}"
@@ -130,7 +144,7 @@ menu() {
 
 # Main
 menu
-read -p "Please enter your selection [0-3]:" choice
+read -p "Please enter your selection [0-4]:" choice
 
 case "$choice" in
    1)
@@ -142,6 +156,9 @@ case "$choice" in
         uninstall
         ;;
     3)
+        warp_plus
+        ;;
+    4)
         build
         ;;
     0)
