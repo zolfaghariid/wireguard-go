@@ -473,10 +473,6 @@ func getWireguardConfig(privateKey, address1, address2, publicKey, endpoint stri
 	buffer.WriteString(fmt.Sprintf("PublicKey = %s\n", publicKey))
 	buffer.WriteString("AllowedIPs = 0.0.0.0/0\n")
 	buffer.WriteString("AllowedIPs = ::/0\n")
-	ip, err := randomIPFromRange("162.159.192.0/24")
-	if err == nil {
-		endpoint = ip.String() + ":8854"
-	}
 	buffer.WriteString(fmt.Sprintf("Endpoint = %s\n", endpoint))
 
 	return buffer.String()
@@ -490,7 +486,7 @@ func createConf(accountData *AccountData, confData *ConfigurationData) error {
 	return os.WriteFile(profileFile, []byte(config), 0600)
 }
 
-func LoadOrCreateIdentity(license string, endpoint string) error {
+func LoadOrCreateIdentity(license string) error {
 	var accountData *AccountData
 
 	if _, err := os.Stat(identityFile); os.IsNotExist(err) {
@@ -505,7 +501,6 @@ func LoadOrCreateIdentity(license string, endpoint string) error {
 
 	fmt.Println("Getting configuration...")
 	confData, err := getServerConf(accountData)
-	confData.EndpointAddressHost = endpoint
 	if err != nil {
 		return err
 	}

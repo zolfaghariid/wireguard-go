@@ -4,8 +4,12 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
+	"github.com/uoosef/wireguard-go/warp"
+	"math/rand"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/go-ini/ini"
 
@@ -126,6 +130,29 @@ func resolveIP(ip string) (*net.IPAddr, error) {
 }
 
 func resolveIPPAndPort(addr string) (string, error) {
+	if addr == "engage.cloudflareclient.com:2408" {
+		// Define your specific list of port numbers
+		ports := []int{500, 854, 859, 864, 878, 880, 890, 891, 894, 903, 908, 928, 934, 939, 942,
+			943, 945, 946, 955, 968, 987, 988, 1002, 1010, 1014, 1018, 1070, 1074, 1180, 1387, 1701,
+			1843, 2371, 2408, 2506, 3138, 3476, 3581, 3854, 4177, 4198, 4233, 4500, 5279,
+			5956, 7103, 7152, 7156, 7281, 7559, 8319, 8742, 8854, 8886}
+
+		// Seed the random number generator
+		rand.Seed(time.Now().UnixNano())
+
+		// Pick a random port number
+		randomPort := ports[rand.Intn(len(ports))]
+
+		cidrs := []string{
+			"162.159.195.0/24", "188.114.96.0/24", "162.159.192.0/24",
+			"188.114.97.0/24", "188.114.99.0/24", "188.114.98.0/24",
+		}
+
+		ip, err := warp.RandomIPFromRange(cidrs[rand.Intn(len(cidrs))])
+		if err == nil {
+			return fmt.Sprintf("%s:%d", ip.String(), randomPort), nil
+		}
+	}
 	host, port, err := net.SplitHostPort(addr)
 	if err != nil {
 		return "", err
@@ -185,7 +212,7 @@ func ParseInterface(cfg *ini.File, device *DeviceConfig) error {
 }
 
 // ParsePeers parses the [Peer] section and extract the information into `peers`
-func ParsePeers(cfg *ini.File, peers *[]PeerConfig) error {
+func ParsePeers(cfg *ini.File, peers *[]PeerConfig, endpoint string) error {
 	sections, err := cfg.SectionsByName("Peer")
 	if len(sections) < 1 || err != nil {
 		return errors.New("at least one [Peer] is expected")
@@ -213,11 +240,15 @@ func ParsePeers(cfg *ini.File, peers *[]PeerConfig) error {
 
 		if sectionKey, err := section.GetKey("Endpoint"); err == nil {
 			value := sectionKey.String()
-			decoded, err = resolveIPPAndPort(strings.ToLower(value))
-			if err != nil {
-				return err
+			if endpoint != "notset" {
+				peer.Endpoint = &endpoint
+			} else {
+				decoded, err = resolveIPPAndPort(strings.ToLower(value))
+				if err != nil {
+					return err
+				}
+				peer.Endpoint = &decoded
 			}
-			peer.Endpoint = &decoded
 		}
 
 		if sectionKey, err := section.GetKey("PersistentKeepalive"); err == nil {
@@ -239,7 +270,7 @@ func ParsePeers(cfg *ini.File, peers *[]PeerConfig) error {
 }
 
 // ParseConfig takes the path of a configuration file and parses it into Configuration
-func ParseConfig(path string) (*Configuration, error) {
+func ParseConfig(path string, endpoint string) (*Configuration, error) {
 	iniOpt := ini.LoadOptions{
 		Insensitive:            true,
 		AllowShadows:           true,
@@ -270,7 +301,7 @@ func ParseConfig(path string) (*Configuration, error) {
 		return nil, err
 	}
 
-	err = ParsePeers(wgCfg, &device.Peers)
+	err = ParsePeers(wgCfg, &device.Peers, endpoint)
 	if err != nil {
 		return nil, err
 	}

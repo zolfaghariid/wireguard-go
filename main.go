@@ -21,7 +21,7 @@ func main() {
 		verbose     = flag.Bool("v", false, "verbose")
 		bindAddress = flag.String("b", "127.0.0.1:8086", "socks bind address")
 		configFile  = flag.String("c", "./wgcf-profile.ini", "ini config file path")
-		endpoint    = flag.String("e", "162.159.195.1:8854", "warp clean ip")
+		endpoint    = flag.String("e", "notset", "warp clean ip")
 		license     = flag.String("k", "notset", "license key")
 	)
 
@@ -33,14 +33,14 @@ func main() {
 		if *license == "notset" {
 			*license = ""
 		}
-		err := warp.LoadOrCreateIdentity(*license, *endpoint)
+		err := warp.LoadOrCreateIdentity(*license)
 		if err != nil {
 			fmt.Printf("error: %v", err)
 			os.Exit(2)
 		}
 	}
 
-	conf, err := wiresocks.ParseConfig(*configFile)
+	conf, err := wiresocks.ParseConfig(*configFile, *endpoint)
 	if err != nil {
 		log.Fatal(err)
 	}
