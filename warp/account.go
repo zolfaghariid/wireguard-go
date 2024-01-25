@@ -490,7 +490,7 @@ func createConf(accountData *AccountData, confData *ConfigurationData) error {
 	return os.WriteFile(profileFile, []byte(config), 0600)
 }
 
-func LoadOrCreateIdentity(license string, endpoint string) {
+func LoadOrCreateIdentity(license string, endpoint string) error {
 	var accountData *AccountData
 
 	if _, err := os.Stat(identityFile); os.IsNotExist(err) {
@@ -507,29 +507,25 @@ func LoadOrCreateIdentity(license string, endpoint string) {
 	confData, err := getServerConf(accountData)
 	confData.EndpointAddressHost = endpoint
 	if err != nil {
-		fmt.Println("Error: " + err.Error())
-		os.Exit(2)
+		return err
 	}
 
 	// updating license key
 	fmt.Println("Updating account license key...")
 	result, err := updateLicenseKey(accountData, confData)
 	if err != nil {
-		fmt.Println("Error: " + err.Error())
-		os.Exit(2)
+		return err
 	}
 	if result {
 		confData, err = getServerConf(accountData)
 		if err != nil {
-			fmt.Println("Error: " + err.Error())
-			os.Exit(2)
+			return err
 		}
 	}
 
 	deviceStatus, err := getDeviceActive(accountData)
 	if err != nil {
-		fmt.Println("Error: " + err.Error())
-		os.Exit(2)
+		return err
 	}
 	if !deviceStatus {
 		fmt.Println("This device is not registered to the account!")
@@ -544,8 +540,7 @@ func LoadOrCreateIdentity(license string, endpoint string) {
 		fmt.Println("Enabling Warp...")
 		err := enableWarp(accountData)
 		if err != nil {
-			fmt.Println("Unable to enable warp, Error: " + err.Error())
-			os.Exit(2)
+			return err
 		}
 		confData.WarpEnabled = true
 	}
@@ -558,13 +553,13 @@ func LoadOrCreateIdentity(license string, endpoint string) {
 	fmt.Println("Creating WireGuard configuration...")
 	err = createConf(accountData, confData)
 	if err != nil {
-		fmt.Println("Unable to enable write config file, Error: " + err.Error())
-		os.Exit(2)
+		return fmt.Errorf("unable to enable write config file, Error: %v", err.Error())
 	}
 
 	fmt.Println("All done! Find your files here:")
 	fmt.Println(filepath.Abs(identityFile))
 	fmt.Println(filepath.Abs(profileFile))
+	return nil
 }
 
 func CheckProfileExists(license string) bool {
