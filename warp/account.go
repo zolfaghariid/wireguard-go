@@ -473,10 +473,6 @@ func getWireguardConfig(privateKey, address1, address2, publicKey, endpoint stri
 	buffer.WriteString(fmt.Sprintf("PublicKey = %s\n", publicKey))
 	buffer.WriteString("AllowedIPs = 0.0.0.0/0\n")
 	buffer.WriteString("AllowedIPs = ::/0\n")
-	ip, err := randomIPFromRange("162.159.192.0/24")
-	if err == nil {
-		endpoint = ip.String() + ":8854"
-	}
 	buffer.WriteString(fmt.Sprintf("Endpoint = %s\n", endpoint))
 
 	return buffer.String()
@@ -490,7 +486,7 @@ func createConf(accountData *AccountData, confData *ConfigurationData) error {
 	return os.WriteFile(profileFile, []byte(config), 0600)
 }
 
-func LoadOrCreateIdentity(license string, endpoint string) {
+func LoadOrCreateIdentity(license string) error {
 	var accountData *AccountData
 
 	if _, err := os.Stat(identityFile); os.IsNotExist(err) {
@@ -505,31 +501,26 @@ func LoadOrCreateIdentity(license string, endpoint string) {
 
 	fmt.Println("Getting configuration...")
 	confData, err := getServerConf(accountData)
-	confData.EndpointAddressHost = endpoint
 	if err != nil {
-		fmt.Println("Error: " + err.Error())
-		os.Exit(2)
+		return err
 	}
 
 	// updating license key
 	fmt.Println("Updating account license key...")
 	result, err := updateLicenseKey(accountData, confData)
 	if err != nil {
-		fmt.Println("Error: " + err.Error())
-		os.Exit(2)
+		return err
 	}
 	if result {
 		confData, err = getServerConf(accountData)
 		if err != nil {
-			fmt.Println("Error: " + err.Error())
-			os.Exit(2)
+			return err
 		}
 	}
 
 	deviceStatus, err := getDeviceActive(accountData)
 	if err != nil {
-		fmt.Println("Error: " + err.Error())
-		os.Exit(2)
+		return err
 	}
 	if !deviceStatus {
 		fmt.Println("This device is not registered to the account!")
@@ -544,8 +535,7 @@ func LoadOrCreateIdentity(license string, endpoint string) {
 		fmt.Println("Enabling Warp...")
 		err := enableWarp(accountData)
 		if err != nil {
-			fmt.Println("Unable to enable warp, Error: " + err.Error())
-			os.Exit(2)
+			return err
 		}
 		confData.WarpEnabled = true
 	}
@@ -558,43 +548,50 @@ func LoadOrCreateIdentity(license string, endpoint string) {
 	fmt.Println("Creating WireGuard configuration...")
 	err = createConf(accountData, confData)
 	if err != nil {
-		fmt.Println("Unable to enable write config file, Error: " + err.Error())
-		os.Exit(2)
+		return fmt.Errorf("unable to enable write config file, Error: %v", err.Error())
 	}
 
 	fmt.Println("All done! Find your files here:")
 	fmt.Println(filepath.Abs(identityFile))
 	fmt.Println(filepath.Abs(profileFile))
+	return nil
 }
 
-func CheckProfileExists(license string) bool {
-	if _, err := os.Stat(profileFile); os.IsNotExist(err) {
-		return false
-	}
-	ad := &AccountData{} // Read errors caught by unmarshal
-	fileBytes, _ := os.ReadFile(identityFile)
-	err := json.Unmarshal(fileBytes, ad)
-	if err != nil {
-		e := os.Remove(profileFile)
-		if e != nil {
-			log.Fatal(e)
-		}
-		e = os.Remove(identityFile)
-		if e != nil {
-			log.Fatal(e)
-		}
-		return false
-	}
-	if license != "notset" && ad.LicenseKey != license {
-		e := os.Remove(profileFile)
-		if e != nil {
-			log.Fatal(e)
-		}
-		e = os.Remove(identityFile)
-		if e != nil {
-			log.Fatal(e)
-		}
+func fileExist(f string) bool {
+	if _, err := os.Stat(f); os.IsNotExist(err) {
 		return false
 	}
 	return true
+}
+func removeFile(f string) {
+	if fileExist(f) {
+		e := os.Remove(f)
+		if e != nil {
+			log.Fatal(e)
+		}
+	} else {
+		log.Printf("file %s is not exist!", f)
+	}
+}
+func CheckProfileExists(license string) bool {
+	isOk := true
+	if !fileExist(identityFile) || !fileExist(profileFile) {
+		isOk = false
+	}
+
+	ad := &AccountData{} // Read errors caught by unmarshal
+	if isOk {
+		fileBytes, _ := os.ReadFile(identityFile)
+		err := json.Unmarshal(fileBytes, ad)
+		if err != nil {
+			isOk = false
+		} else if license != "notset" && ad.LicenseKey != license {
+			isOk = false
+		}
+	}
+	if !isOk {
+		removeFile(profileFile)
+		removeFile(identityFile)
+	}
+	return isOk
 }

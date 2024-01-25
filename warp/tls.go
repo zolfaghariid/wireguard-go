@@ -162,7 +162,7 @@ func (d *Dialer) makeTLSHelloPacketWithSNICurve(plainConn net.Conn, config *tls.
 	return utlsConn, nil
 }
 
-func randomIPFromRange(cidr string) (net.IP, error) {
+func RandomIPFromRange(cidr string) (net.IP, error) {
 
 GENERATE:
 
@@ -207,7 +207,7 @@ func (d *Dialer) TLSDial(plainDialer *net.Dialer, network, addr string) (net.Con
 	if err != nil {
 		return nil, err
 	}
-	ip, err := randomIPFromRange("141.101.113.0/24")
+	ip, err := RandomIPFromRange("141.101.113.0/24")
 	if err != nil {
 		return nil, err
 	}
