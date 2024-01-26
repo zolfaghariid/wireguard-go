@@ -15,6 +15,8 @@ type VirtualTun struct {
 	SystemDNS bool
 }
 
+var Verbose bool
+
 // StartProxy spawns a socks5 server.
 func StartProxy(vt *VirtualTun, bindAddress string) {
 	proxy := mixed.NewProxy(
@@ -27,7 +29,9 @@ func StartProxy(vt *VirtualTun, bindAddress string) {
 }
 
 func generalHandler(req *statute.ProxyRequest, vt *VirtualTun) error {
-	fmt.Println(fmt.Sprintf("handling %s request to %s", req.Network, req.Destination))
+	if Verbose {
+		log.Println(fmt.Sprintf("handling %s request to %s", req.Network, req.Destination))
+	}
 	conn, err := vt.Tnet.Dial(req.Network, req.Destination)
 	if err != nil {
 		return err
