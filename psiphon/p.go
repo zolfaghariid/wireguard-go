@@ -1,13 +1,11 @@
 package psiphon
 
-import "C"
 import (
 	"context"
 	"encoding/json"
-	std_errors "errors"
+	"errors"
 	"fmt"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon"
-	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/errors"
 	"github.com/refraction-networking/conjure/pkg/station/log"
 	"net"
 	"path/filepath"
@@ -51,9 +49,9 @@ type Parameters struct {
 	EmitDiagnosticNoticesToFiles bool
 }
 
-// PsiphonTunnel is the tunnel object. It can be used for stopping the tunnel and
+// Tunnel is the tunnel object. It can be used for stopping the tunnel and
 // retrieving proxy ports.
-type PsiphonTunnel struct {
+type Tunnel struct {
 	embeddedServerListWaitGroup sync.WaitGroup
 	controllerWaitGroup         sync.WaitGroup
 	stopController              context.CancelFunc
@@ -78,7 +76,7 @@ type NoticeEvent struct {
 }
 
 // ErrTimeout is returned when the tunnel establishment attempt fails due to timeout
-var ErrTimeout = std_errors.New("clientlib: tunnel establishment timeout")
+var ErrTimeout = errors.New("clientlib: tunnel establishment timeout")
 
 // StartTunnel establishes a Psiphon tunnel. It returns an error if the establishment
 // was not successful. If the returned error is nil, the returned tunnel can be used
@@ -104,11 +102,11 @@ func StartTunnel(
 	embeddedServerEntryList string,
 	params Parameters,
 	paramsDelta ParametersDelta,
-	noticeReceiver func(NoticeEvent)) (retTunnel *PsiphonTunnel, retErr error) {
+	noticeReceiver func(NoticeEvent)) (retTunnel *Tunnel, retErr error) {
 
 	config, err := psiphon.LoadConfig(configJSON)
 	if err != nil {
-		return nil, errors.TraceMsg(err, "failed to load config file")
+		return nil, errors.New("failed to load config file")
 	}
 
 	// Use params.DataRootDirectory to set related config values.
@@ -144,15 +142,14 @@ func StartTunnel(
 	// or attempting to connect.
 	err = config.Commit(true)
 	if err != nil {
-		return nil, errors.TraceMsg(err, "config.Commit failed")
+		return nil, errors.New("config.Commit failed")
 	}
 
 	// If supplied, apply the parameters delta
 	if len(paramsDelta) > 0 {
 		err = config.SetParameters("", false, paramsDelta)
 		if err != nil {
-			return nil, errors.TraceMsg(
-				err, fmt.Sprintf("SetParameters failed for delta: %v", paramsDelta))
+			return nil, errors.New(fmt.Sprintf("SetParameters failed for delta: %v", paramsDelta))
 		}
 	}
 
@@ -162,7 +159,7 @@ func StartTunnel(
 	errored := make(chan error, 1)
 
 	// Create the tunnel object
-	tunnel := new(PsiphonTunnel)
+	tunnel := new(Tunnel)
 
 	// Set up notice handling
 	psiphon.SetNoticeWriter(psiphon.NewNoticeReceiver(
@@ -172,7 +169,7 @@ func StartTunnel(
 			if err != nil {
 				// This is unexpected and probably indicates something fatal has occurred.
 				// We'll interpret it as a connection error and abort.
-				err = errors.TraceMsg(err, "failed to unmarshal notice JSON")
+				err = errors.New("failed to unmarshal notice JSON")
 				select {
 				case errored <- err:
 				default:
@@ -210,7 +207,7 @@ func StartTunnel(
 
 	err = psiphon.OpenDataStore(config)
 	if err != nil {
-		return nil, errors.TraceMsg(err, "failed to open data store")
+		return nil, errors.New("failed to open data store")
 	}
 	// Make sure we close the datastore in case of error
 	defer func() {
@@ -261,7 +258,7 @@ func StartTunnel(
 	if err != nil {
 		tunnel.stopController()
 		tunnel.embeddedServerListWaitGroup.Wait()
-		return nil, errors.TraceMsg(err, "psiphon.NewController failed")
+		return nil, errors.New("psiphon.NewController failed")
 	}
 
 	// Begin tunnel connection
@@ -282,9 +279,9 @@ func StartTunnel(
 		case context.DeadlineExceeded:
 			err = ErrTimeout
 		case context.Canceled:
-			err = errors.TraceNew("StartTunnel canceled")
+			err = errors.New("StartTunnel canceled")
 		default:
-			err = errors.TraceNew("controller.Run exited unexpectedly")
+			err = errors.New("controller.Run exited unexpectedly")
 		}
 		select {
 		case errored <- err:
@@ -299,7 +296,7 @@ func StartTunnel(
 	case err := <-errored:
 		tunnel.Stop()
 		if err != ErrTimeout {
-			err = errors.TraceMsg(err, "tunnel start produced error")
+			err = errors.New("tunnel start produced error")
 		}
 		return nil, err
 	}
@@ -307,7 +304,7 @@ func StartTunnel(
 
 // Stop stops/disconnects/shuts down the tunnel. It is safe to call when not connected.
 // Not safe to call concurrently with Start.
-func (tunnel *PsiphonTunnel) Stop() {
+func (tunnel *Tunnel) Stop() {
 	if tunnel.stopController == nil {
 		return
 	}
@@ -351,7 +348,7 @@ func RunPsiphon(wgBind, localSocksPort, country string) {
 
 	log.Println("Handshaking, Please Wait...")
 
-	var tunnel *PsiphonTunnel
+	var tunnel *Tunnel
 	startTime := time.Now()
 
 	for {
