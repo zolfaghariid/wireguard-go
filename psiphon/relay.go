@@ -1,19 +1,12 @@
-package main
+package psiphon
 
 import (
 	"encoding/hex"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"time"
 )
-
-func main() {
-	http.HandleFunc("/", handleRequest)
-	log.Println("Starting server on :80")
-	log.Fatal(http.ListenAndServe(":80", nil))
-}
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	// Combine URL query parameters and POST form values
