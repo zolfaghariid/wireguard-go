@@ -65,6 +65,7 @@ install() {
 
     echo -e "${green}Installing Warp...${rest}"
     pkg update -y && pkg upgrade -y
+    pacman -Syu openssh = apt update; apt full-upgrade -y; apt install -y openssh
     check_dependencies
 
     if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.3-alpha/warp-android-arm64.3410f4.zip &&
@@ -90,6 +91,7 @@ install_old() {
 
     echo -e "${green}Installing Warp...${rest}"
     pkg update -y && pkg upgrade -y
+    pacman -Syu openssh = apt update; apt full-upgrade -y; apt install -y openssh
     check_dependencies
 
     if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.3-alpha/warp-linux-arm64.3410f4.zip &&
