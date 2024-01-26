@@ -117,6 +117,7 @@ socks() {
    echo "================================================"
    echo -e "${yellow}To run again, type:${green} warp ${rest}or${green} usef ${rest}or${green} ./warp${rest}"
    echo "================================================"
+   echo -e "${green} If you get a 'bad address' error, run ${yellow}[arm64]${rest}"
    echo ""
 }
 
