@@ -181,6 +181,7 @@ case "$choice" in
         ;;
     2)
         install_old
+        warp
         ;;
     3)
         uninstall
