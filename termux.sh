@@ -11,7 +11,7 @@ rest='\033[0m'
 
 # Check Dependencies build
 check_dependencies_build() {
-    local dependencies=("curl" "git" "golang")
+    local dependencies=("curl" "wget" "git" "golang")
 
     for dep in "${dependencies[@]}"; do
         if ! dpkg -s "${dep}" &> /dev/null; then
@@ -23,7 +23,7 @@ check_dependencies_build() {
 
 # Check Dependencies
 check_dependencies() {
-    local dependencies=("curl" "wget" "unzip")
+    local dependencies=("curl" "openssl-tool" "wget" "unzip")
 
     for dep in "${dependencies[@]}"; do
         if ! dpkg -s "${dep}" &> /dev/null; then
@@ -67,14 +67,40 @@ install() {
     pkg update -y && pkg upgrade -y
     check_dependencies
 
-    if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.2-alpha/warp-android-arm64.02bb9b.zip &&
-        unzip warp-android-arm64.02bb9b.zip &&
+    if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.3-alpha/warp-android-arm64.3410f4.zip &&
+        unzip warp-android-arm64.3410f4.zip &&
         chmod +x warp &&
         cp warp "$PREFIX/bin/usef" &&
         cp warp "$PREFIX/bin/warp"; then
-        rm "README.md" "LICENSE" "warp-android-arm64.02bb9b.zip"
+        rm "README.md" "LICENSE" "warp-android-arm64.3410f4.zip"
         echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
+        socks
+    else
+        echo -e "${red}Error installing Warp.${rest}"
+    fi
+}
+
+# arm 64 (old phone)
+install_old() {
+    if command -v warp &> /dev/null || command -v usef &> /dev/null; then
+        echo -e "${green}Warp is already installed.${rest}"
+        return
+    fi
+
+    echo -e "${green}Installing Warp...${rest}"
+    pkg update -y && pkg upgrade -y
+    check_dependencies
+
+    if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.3-alpha/warp-linux-arm64.3410f4.zip &&
+        unzip warp-linux-arm64.3410f4.zip &&
+        chmod +x warp &&
+        cp warp "$PREFIX/bin/usef" &&
+        cp warp "$PREFIX/bin/warp"; then
+        rm "README.md" "LICENSE" "warp-linux-arm64.3410f4.zip"
+        echo "================================================"
+        echo -e "${green}Warp installed successfully.${rest}"
+        socks
     else
         echo -e "${red}Error installing Warp.${rest}"
     fi
@@ -91,6 +117,7 @@ socks() {
    echo "================================================"
    echo -e "${yellow}To run again, type:${green} warp ${rest}or${green} usef ${rest}or${green} ./warp${rest}"
    echo "================================================"
+   echo -e "${green} If you get a 'Bad address' error, run ${yellow}[arm64]${rest}"
    echo ""
 }
 
@@ -100,13 +127,25 @@ uninstall() {
     directory="/data/data/com.termux/files/home/wireguard-go"
     home="/data/data/com.termux/files/home"
     if [ -f "$warp" ]; then
-        rm -rf "$directory" "$PREFIX/bin/usef" "$PREFIX/bin/warp" "$home/wgcf-profile.ini" "$home/warp" "$home/wgcf-identity.json" > /dev/null 2>&1
+        rm -rf "$directory" "$PREFIX/bin/usef" "wa.py" "$PREFIX/bin/warp" "$home/wgcf-profile.ini" "$home/warp" "$home/wgcf-identity.json" > /dev/null 2>&1
         echo -e "${red}Uninstallation completed.${rest}"
     else
         echo -e "${yellow} ____________________________________${rest}"
         echo -e "${red} Not installed.Please Install First.${rest}${yellow}|"
         echo -e "${yellow} ____________________________________${rest}"
     fi
+}
+
+# Warp to Warp plus
+warp_plus() {
+    if ! command -v python &> /dev/null; then
+        echo "Installing Python..."
+        pkg install python -y
+    fi
+
+    echo -e "${green}Downloading and running${purple} Warp+ script...${rest}"
+    wget -O wa.py https://raw.githubusercontent.com/Ptechgithub/configs/main/wa.py
+    python wa.py
 }
 
 # Menu
@@ -120,9 +159,13 @@ menu() {
     echo -e "${purple}*********************************${rest}"
     echo -e "${cyan}1)${rest} ${green}Install Warp (vpn)${purple}           * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
-    echo -e "${cyan}2)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
+    echo -e "${cyan}2)${rest} ${green}Install Warp (vpn) [${yellow}arm 64${green}] ${purple} * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
-    echo -e "${cyan}3)${rest} ${green}Build (warp)${purple}                 * ${rest}"
+    echo -e "${cyan}3)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
+    echo -e "                              ${purple}  * ${rest}"
+    echo -e "${cyan}4)${rest} ${green}Warp to ${purple}Warp plus${green} [${yellow}Free GB${green}]${rest}${purple}  * ${rest}"
+    echo -e "                              ${purple}  * ${rest}"
+    echo -e "${cyan}5)${rest} ${green}Build (warp)${purple}                 * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${red}0)${rest} ${green}Exit                         ${purple}* ${rest}"
     echo -e "${purple}*********************************${rest}"
@@ -130,18 +173,24 @@ menu() {
 
 # Main
 menu
-read -p "Please enter your selection [0-3]:" choice
+read -p "Please enter your selection [0-5]:" choice
 
 case "$choice" in
    1)
         install
-        socks
         warp
         ;;
     2)
-        uninstall
+        install_old
+        warp
         ;;
     3)
+        uninstall
+        ;;
+    4)
+        warp_plus
+        ;;
+    5)
         build
         ;;
     0)
