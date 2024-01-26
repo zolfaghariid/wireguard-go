@@ -182,13 +182,13 @@ case "$choice" in
     2)
         install_old
         ;;
-    2)
+    3)
         uninstall
         ;;
-    3)
+    4)
         warp_plus
         ;;
-    4)
+    5)
         build
         ;;
     0)
