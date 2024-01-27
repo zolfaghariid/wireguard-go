@@ -9,6 +9,7 @@ import (
 	"github.com/refraction-networking/conjure/pkg/station/log"
 	"net"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 )
@@ -320,6 +321,11 @@ func RunPsiphon(wgBind, localSocksPort, country string) context.Context {
 	host, port, err := net.SplitHostPort(localSocksPort)
 	if err != nil {
 		log.Fatal(err)
+	}
+	if strings.HasPrefix(host, "127.0.0") {
+		host = ""
+	} else {
+		host = "any"
 	}
 	configJSON := `{
 		"EgressRegion": "` + country + `",
