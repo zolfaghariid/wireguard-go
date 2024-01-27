@@ -46,6 +46,39 @@ Run the application with the following command:
 - `-country`: ISO 3166-1 alpha-2 country code for Psiphon.
 - `-cfon`: Enable Psiphon over Warp.
 
+### Country Codes for Psiphon
+
+- Austria (AT)
+- Belgium (BE)
+- Bulgaria (BG)
+- Brazil (BR)
+- Canada (CA)
+- Switzerland (CH)
+- Czech Republic (CZ)
+- Germany (DE)
+- Denmark (DK)
+- Estonia (EE)
+- Spain (ES)
+- Finland (FI)
+- France (FR)
+- United Kingdom (GB)
+- Hungary (HU)
+- Ireland (IE)
+- India (IN)
+- Italy (IT)
+- Japan (JP)
+- Latvia (LV)
+- Netherlands (NL)
+- Norway (NO)
+- Poland (PL)
+- Romania (RO)
+- Serbia (RS)
+- Sweden (SE)
+- Singapore (SG)
+- Slovakia (SK)
+- Ukraine (UA)
+- United States (US)
+
 ### Termux
 
 ```
