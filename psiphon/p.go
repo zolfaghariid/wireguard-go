@@ -314,14 +314,16 @@ func (tunnel *Tunnel) Stop() {
 	psiphon.CloseDataStore()
 }
 
-func RunPsiphon(wgBind, localSocksPort, country string) {
+func RunPsiphon(wgBind, localSocksPort, country string) context.Context {
+	ctx := context.Background()
 	// Embedded configuration
-	_, port, err := net.SplitHostPort(localSocksPort)
+	host, port, err := net.SplitHostPort(localSocksPort)
 	if err != nil {
 		log.Fatal(err)
 	}
 	configJSON := `{
 		"EgressRegion": "` + country + `",
+		"ListenInterface": "` + host + `",
 		"LocalSocksProxyPort": ` + port + `,
 		"UpstreamProxyURL": "socks5://` + wgBind + `",
 		"DisableLocalHTTPProxy": true,
@@ -351,14 +353,18 @@ func RunPsiphon(wgBind, localSocksPort, country string) {
 	var tunnel *Tunnel
 	startTime := time.Now()
 
-	for {
-		tunnel, err = StartTunnel(context.Background(), []byte(configJSON), "", p, nil, nil)
-		if err == nil {
-			break
+	go func() {
+		for {
+			tunnel, err = StartTunnel(ctx, []byte(configJSON), "", p, nil, nil)
+			if err == nil {
+				break
+			}
+			log.Error("Unable to start psiphon", err, "reconnecting...")
+			time.Sleep(2 * time.Second)
 		}
-		log.Error("Unable to start psiphon", err, "reconnecting...")
-		time.Sleep(2 * time.Second)
-	}
 
-	log.Println("Psiphon started successfully on port", tunnel.SOCKSProxyPort, "handshake operation took", int64(time.Since(startTime)/time.Millisecond), "milliseconds")
+		log.Println("Psiphon started successfully on port", tunnel.SOCKSProxyPort, "handshake operation took", int64(time.Since(startTime)/time.Millisecond), "milliseconds")
+	}()
+
+	return ctx
 }

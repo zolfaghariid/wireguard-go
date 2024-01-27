@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"github.com/uoosef/wireguard-go/device"
 	"github.com/uoosef/wireguard-go/psiphon"
@@ -28,6 +29,7 @@ func main() {
 		country        = flag.String("country", "", "psiphon country code in ISO 3166-1 alpha-2 format")
 		psiphonEnabled = flag.Bool("cfon", false, "enable psiphonEnabled over warp")
 		pbind          = "127.0.0.1:8086"
+		psiphonCtx     context.Context
 	)
 
 	flag.Usage = usage
@@ -77,13 +79,17 @@ func main() {
 	go wiresocks.StartProxy(tnet, *bindAddress)
 
 	if *psiphonEnabled {
-		psiphon.RunPsiphon(*bindAddress, pbind, *country)
+		psiphonCtx = psiphon.RunPsiphon(*bindAddress, pbind, *country)
 	} else {
 		log.Println("Wiresocks started successfully")
 	}
 
 	// Wait for interrupt signal
 	<-sigChan
+
+	if *psiphonEnabled {
+		psiphonCtx.Done()
+	}
 
 	log.Println("Bye!")
 }
