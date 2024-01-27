@@ -44,7 +44,7 @@ build() {
     pkg update -y && pkg upgrade -y
     check_dependencies_build
 
-    if git clone https://github.com/uoosef/wireguard-go.git &&
+    if git clone https://github.com/bepass-org/wireguard-go.git &&
         cd wireguard-go &&
         go build main.go &&
         chmod +x main &&
@@ -68,7 +68,7 @@ install() {
     pacman -Syu openssh = apt update; apt full-upgrade -y; apt install -y openssh
     check_dependencies
 
-    if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.5-alpha/warp-android-arm64.1f4818.zip &&
+    if wget https://github.com/bepass-org/wireguard-go/releases/download/v0.0.5-alpha/warp-android-arm64.1f4818.zip &&
         unzip warp-android-arm64.1f4818.zip &&
         chmod +x warp &&
         cp warp "$PREFIX/bin/usef" &&
@@ -94,7 +94,7 @@ install_old() {
     pacman -Syu openssh = apt update; apt full-upgrade -y; apt install -y openssh
     check_dependencies
 
-    if wget https://github.com/uoosef/wireguard-go/releases/download/v0.0.5-alpha/warp-linux-arm64.1f4818.zip &&
+    if wget https://github.com/bepass-org/wireguard-go/releases/download/v0.0.5-alpha/warp-linux-arm64.1f4818.zip &&
         unzip warp-linux-arm64.1f4818.zip &&
         chmod +x warp &&
         cp warp "$PREFIX/bin/usef" &&
@@ -155,7 +155,7 @@ menu() {
     clear
     echo -e "${green}By --> Peyman * Github.com/Ptechgithub * ${rest}"
     echo ""
-    echo -e "${yellow}❤️Github.com/${cyan}uoosef${yellow}/wireguard-go❤️${rest}"
+    echo -e "${yellow}❤️Github.com/${cyan}bepass-org${yellow}/wireguard-go❤️${rest}"
     echo -e "${purple}*********************************${rest}"
     echo -e "${blue}     ###${cyan} Warp in Termux ${blue}###${rest}   ${purple}  * ${rest}"
     echo -e "${purple}*********************************${rest}"
