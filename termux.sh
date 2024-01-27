@@ -155,7 +155,7 @@ menu() {
     clear
     echo -e "${green}By --> Peyman * Github.com/Ptechgithub * ${rest}"
     echo ""
-    echo -e "${yellow}❤️Github.com/${cyan}uoosefg${yellow}/wireguard-go❤️${rest}"
+    echo -e "${yellow}❤️Github.com/${cyan}bepass-org${yellow}/wireguard-go❤️${rest}"
     echo -e "${purple}*********************************${rest}"
     echo -e "${blue}     ###${cyan} Warp in Termux ${blue}###${rest}   ${purple}  * ${rest}"
     echo -e "${purple}*********************************${rest}"
