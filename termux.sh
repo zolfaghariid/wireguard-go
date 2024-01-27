@@ -68,12 +68,12 @@ install() {
     pacman -Syu openssh = apt update; apt full-upgrade -y; apt install -y openssh
     check_dependencies
 
-    if wget https://github.com/bepass-org/wireguard-go/releases/download/v0.0.5-alpha/warp-android-arm64.1f4818.zip &&
-        unzip warp-android-arm64.1f4818.zip &&
+    if wget https://github.com/bepass-org/wireguard-go/releases/download/v0.0.6-alpha/warp-android-arm64.ed853c.zip &&
+        unzip warp-android-arm64.ed853c.zip&&
         chmod +x warp &&
         cp warp "$PREFIX/bin/usef" &&
         cp warp "$PREFIX/bin/warp"; then
-        rm "README.md" "LICENSE" "warp-android-arm64.1f4818.zip"
+        rm "README.md" "LICENSE" "warp-android-arm64.ed853c.zip"
         echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
         socks
@@ -94,12 +94,12 @@ install_old() {
     pacman -Syu openssh = apt update; apt full-upgrade -y; apt install -y openssh
     check_dependencies
 
-    if wget https://github.com/bepass-org/wireguard-go/releases/download/v0.0.5-alpha/warp-linux-arm64.1f4818.zip &&
-        unzip warp-linux-arm64.1f4818.zip &&
+    if wget https://github.com/bepass-org/wireguard-go/releases/download/v0.0.6-alpha/warp-linux-arm64.ed853c.zip &&
+        unzip warp-linux-arm64.ed853c.zip &&
         chmod +x warp &&
         cp warp "$PREFIX/bin/usef" &&
         cp warp "$PREFIX/bin/warp"; then
-        rm "README.md" "LICENSE" "warp-linux-arm64.1f4818.zip"
+        rm "README.md" "LICENSE" "warp-linux-arm64.ed853c.zip"
         echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
         socks
