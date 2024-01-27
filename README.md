@@ -91,6 +91,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Ptechgithub/wireguard-go/mas
 - برای نمایش راهنما ` warp -h` را وارد کنید. 
 - ای پی و پورت `127.0.0.1:8086`پروتکل socks
 - در روش warp به warp plus مقدار account id را وارد میکنید و با این کار هر 20 ثانیه 1 GB به اکانت شما اضافه میشود. 
+- برای تغییر  لوکیشن با استفاده از سایفون برای مثال به USA  از دستور  ` warp -cfon -country US` استفاده کنید. 
 
 
 ## Contributing
