@@ -173,7 +173,7 @@ menu() {
     echo -e "${purple}*********************************${rest}"
     echo -e "${cyan}1)${rest} ${green}Install Warp (vpn)${purple}           * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
-    echo -e "${cyan}2)${rest} ${green}Install Warp (vpn) [${yellow}Arm${green}] ${purple} * ${rest}"
+    echo -e "${cyan}2)${rest} ${green}Install Warp (vpn) [${yellow}Arm${green}] ${purple}    * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${cyan}3)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
