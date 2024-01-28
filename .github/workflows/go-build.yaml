@@ -46,11 +46,6 @@ jobs:
             goarch: arm
             goarm: 5
           # END Linux ARM 5 6 7
-          # BEGIN ARMv8L Linux
-	      - goos: linux
-            goarch: arm
-            goarm: 8
-	      # END ARMv8L Linux
           # BEGIN Android ARM 8
           - goos: android
             goarch: arm64
