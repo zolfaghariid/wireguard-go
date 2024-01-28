@@ -101,7 +101,7 @@ install_arm() {
         armhf) ARCH="arm5" ;;
         arm) ARCH="arm7" ;;
         aarch64) ARCH="arm64" ;;
-        *) echo -e "${red}31mUnsupported architecture.${rest}"; return ;;
+        *) echo -e "${red}Unsupported architecture.${rest}"; return ;;
     esac
 
     WARP_URL="https://github.com/bepass-org/wireguard-go/releases/download/v0.0.6-alpha/warp-linux-$ARCH.ed853c.zip"
