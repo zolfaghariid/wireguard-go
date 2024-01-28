@@ -109,8 +109,8 @@ install_arm() {
     if wget "$WARP_URL" &&
         unzip "warp-linux-$ARCH.ed853c.zip" &&
         chmod +x warp &&
-        mv warp "$PREFIX/bin/usef" &&
-        mv warp "$PREFIX/bin/warp"; then
+        cp warp "$PREFIX/bin/usef" &&
+        cp warp "$PREFIX/bin/warp"; then
         rm "README.md" "LICENSE" "warp-linux-$ARCH.ed853c.zip"
         echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
