@@ -82,8 +82,8 @@ install() {
     fi
 }
 
-# arm 64 (old phone)
-install_old() {
+# Install arm
+install_arm() {
     if command -v warp &> /dev/null || command -v usef &> /dev/null; then
         echo -e "${green}Warp is already installed.${rest}"
         return
@@ -94,12 +94,24 @@ install_old() {
     pacman -Syu openssh = apt update; apt full-upgrade -y; apt install -y openssh
     check_dependencies
 
-    if wget https://github.com/bepass-org/wireguard-go/releases/download/v0.0.6-alpha/warp-linux-arm64.ed853c.zip &&
-        unzip warp-linux-arm64.ed853c.zip &&
+    # Determine architecture
+    case "$(dpkg --print-architecture)" in
+        i386) ARCH="386" ;;
+        amd64) ARCH="amd64" ;;
+        armhf) ARCH="arm5" ;;
+        arm) ARCH="arm7" ;;
+        aarch64) ARCH="arm64" ;;
+        *) echo -e "${red}31mUnsupported architecture.${rest}"; return ;;
+    esac
+
+    WARP_URL="https://github.com/bepass-org/wireguard-go/releases/download/v0.0.6-alpha/warp-linux-$ARCH.ed853c.zip"
+
+    if wget "$WARP_URL" &&
+        unzip "warp-linux-$ARCH.ed853c.zip" &&
         chmod +x warp &&
-        cp warp "$PREFIX/bin/usef" &&
-        cp warp "$PREFIX/bin/warp"; then
-        rm "README.md" "LICENSE" "warp-linux-arm64.ed853c.zip"
+        mv warp "$PREFIX/bin/usef" &&
+        mv warp "$PREFIX/bin/warp"; then
+        rm "README.md" "LICENSE" "warp-linux-$ARCH.ed853c.zip"
         echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
         socks
@@ -161,7 +173,7 @@ menu() {
     echo -e "${purple}*********************************${rest}"
     echo -e "${cyan}1)${rest} ${green}Install Warp (vpn)${purple}           * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
-    echo -e "${cyan}2)${rest} ${green}Install Warp (vpn) [${yellow}arm 64${green}] ${purple} * ${rest}"
+    echo -e "${cyan}2)${rest} ${green}Install Warp (vpn) [${yellow}Arm${green}] ${purple} * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
     echo -e "${cyan}3)${rest} ${green}Uninstall${rest}${purple}                    * ${rest}"
     echo -e "                              ${purple}  * ${rest}"
@@ -183,7 +195,7 @@ case "$choice" in
         warp
         ;;
     2)
-        install_old
+        install_arm
         warp
         ;;
     3)
