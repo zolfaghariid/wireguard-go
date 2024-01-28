@@ -100,6 +100,7 @@ install_arm() {
         amd64) ARCH="amd64" ;;
         armhf) ARCH="arm5" ;;
         armv71) ARCH="arm7" ;;
+        armv81) ARCH="arm7" ;;
         aarch64) ARCH="arm64" ;;
         *) echo -e "${red}Unsupported architecture.${rest}"; return ;;
     esac
