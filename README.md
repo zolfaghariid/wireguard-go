@@ -1,11 +1,12 @@
 # Warp-Plus-Go
 
-Warp-Plus-Go is an open-source implementation of Cloudflare's Warp, enhanced with Psiphon integration for circumventing censorship. This project aims to provide a robust and cross-platform VPN solution that can automatically switch to Psiphon when Warp connectivity is restricted or blocked.
+Warp-Plus-Go is an open-source implementation of Cloudflare's Warp, enhanced with Psiphon integration for circumventing censorship. This project aims to provide a robust and cross-platform VPN solution that can use psiphon on top of warp and warp-in-warp for changing the user virtual nat location.
 
 ## Features
 
 - **Warp Integration**: Leverages Cloudflare's Warp to provide a fast and secure VPN service.
 - **Psiphon Chaining**: Integrates with Psiphon for censorship circumvention, allowing seamless access to the internet in restrictive environments.
+- **Warp in Warp Chaining**: Chaning two instances of warp together to bypass location restrictions.
 - **Cross-Platform Support**: Designed to work on multiple platforms, offering the same level of functionality and user experience.
 - **SOCKS5 Proxy Support**: Includes a SOCKS5 proxy for secure and private browsing.
 - **Verbose Logging**: Optional verbose logging for troubleshooting and performance monitoring.
@@ -14,7 +15,7 @@ Warp-Plus-Go is an open-source implementation of Cloudflare's Warp, enhanced wit
 
 ### Prerequisites
 
-- Go (version 1.15 or later recommended)
+- You can download prebuilt binaries or compile it with Go (You MUST use go 1.20)
 - Basic understanding of VPN and proxy configurations
 
 ### Installation
@@ -35,7 +36,7 @@ Warp-Plus-Go is an open-source implementation of Cloudflare's Warp, enhanced wit
 Run the application with the following command:
 
 ```bash
-./warp-plus-go [-v] [-b addr:port] [-c config-file-path] [-e warp-ip] [-k license-key] [-country country-code] [-cfon]
+./warp-plus-go [-v] [-b addr:port] [-c config-file-path] [-e warp-ip] [-k license-key] [-country country-code] [-cfon] [-gool]
 ```
 
 - `-v`: Enable verbose logging.
@@ -43,6 +44,7 @@ Run the application with the following command:
 - `-c`: Path to the Warp configuration file.
 - `-e`: Specify the Warp endpoint IP.
 - `-k`: Your Warp license key.
+- `-gool`: enable warp in warp.
 - `-country`: ISO 3166-1 alpha-2 country code for Psiphon.
 - `-cfon`: Enable Psiphon over Warp.
 
