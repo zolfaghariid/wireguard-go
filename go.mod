@@ -9,6 +9,7 @@ require (
 	github.com/Psiphon-Labs/psiphon-tunnel-core v0.0.0-00010101000000-000000000000
 	github.com/bepass-org/proxy v0.0.0-20240103080554-a7e12466f91f
 	github.com/go-ini/ini v1.67.0
+	github.com/refraction-networking/conjure v0.7.10-0.20231110193225-e4749a9dedc9
 	github.com/refraction-networking/utls v1.3.3
 	golang.org/x/crypto v0.18.0
 	golang.org/x/net v0.17.0
@@ -58,7 +59,6 @@ require (
 	github.com/pion/transport/v2 v2.2.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
-	github.com/refraction-networking/conjure v0.7.10-0.20231110193225-e4749a9dedc9 // indirect
 	github.com/refraction-networking/ed25519 v0.1.2 // indirect
 	github.com/refraction-networking/gotapdance v1.7.7 // indirect
 	github.com/refraction-networking/obfs4 v0.1.2 // indirect

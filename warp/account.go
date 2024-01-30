@@ -16,11 +16,16 @@ import (
 )
 
 const (
-	apiVersion   = "v0a1922"
-	apiURL       = "https://api.cloudflareclient.com"
-	regURL       = apiURL + "/" + apiVersion + "/reg"
-	identityFile = "./wgcf-identity.json"
-	profileFile  = "./wgcf-profile.ini"
+	apiVersion    = "v0a1922"
+	apiURL        = "https://api.cloudflareclient.com"
+	regURL        = apiURL + "/" + apiVersion + "/reg"
+	_identityFile = "wgcf-identity.json"
+	_profileFile  = "wgcf-profile.ini"
+)
+
+var (
+	identityFile = "wgcf-identity.json"
+	profileFile  = "wgcf-profile.ini"
 )
 
 var defaultHeaders = makeDefaultHeaders()
@@ -569,10 +574,14 @@ func removeFile(f string) {
 		if e != nil {
 			log.Fatal(e)
 		}
-	} else {
-		log.Printf("file %s is not exist!", f)
 	}
 }
+
+func UpdatePath(path string) {
+	identityFile = path + "/" + _identityFile
+	profileFile = path + "/" + _profileFile
+}
+
 func CheckProfileExists(license string) bool {
 	isOk := true
 	if !fileExist(identityFile) || !fileExist(profileFile) {

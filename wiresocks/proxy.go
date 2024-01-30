@@ -13,23 +13,22 @@ import (
 type VirtualTun struct {
 	Tnet      *netstack.Net
 	SystemDNS bool
+	Verbose   bool
 }
 
-var Verbose bool
-
 // StartProxy spawns a socks5 server.
-func StartProxy(vt *VirtualTun, bindAddress string) {
+func (vt *VirtualTun) StartProxy(bindAddress string) {
 	proxy := mixed.NewProxy(
 		mixed.WithBinAddress(bindAddress),
 		mixed.WithUserHandler(func(request *statute.ProxyRequest) error {
-			return generalHandler(request, vt)
+			return vt.generalHandler(request)
 		}),
 	)
 	_ = proxy.ListenAndServe()
 }
 
-func generalHandler(req *statute.ProxyRequest, vt *VirtualTun) error {
-	if Verbose {
+func (vt *VirtualTun) generalHandler(req *statute.ProxyRequest) error {
+	if vt.Verbose {
 		log.Println(fmt.Sprintf("handling %s request to %s", req.Network, req.Destination))
 	}
 	conn, err := vt.Tnet.Dial(req.Network, req.Destination)
