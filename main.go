@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 )
 
 func usage() {
@@ -125,6 +126,9 @@ func runWarpInWarp(bindAddress, endpoint string, verbose bool) {
 	// run secondary warp
 	runWarp(warpBindAddress, endpoint, "./secondary/wgcf-profile.ini", verbose, false)
 
+	// wait for secondary warp
+	waitForPortToGetsOpenOrTimeout(warpBindAddress)
+
 	// run virtual endpoint
 	virtualEndpointBindAddress, err := findFreePort("udp")
 	if err != nil {
@@ -217,4 +221,35 @@ func makeDirs() {
 		log.Fatal("Error changing to 'stuff' directory:", err)
 	}
 	log.Println("Changed working directory to 'stuff'")
+}
+func isPortOpen(address string, timeout time.Duration) bool {
+	// Try to establish a connection
+	conn, err := net.DialTimeout("tcp", address, timeout)
+	if err != nil {
+		return false
+	}
+	defer conn.Close()
+
+	return true
+}
+
+func waitForPortToGetsOpenOrTimeout(addressToCheck string) {
+	timeout := 5 * time.Second
+	checkInterval := 500 * time.Millisecond
+
+	// Set a deadline for when to stop checking
+	deadline := time.Now().Add(timeout)
+
+	for {
+		if time.Now().After(deadline) {
+			log.Fatalf("Timeout reached, port %s is not open", addressToCheck)
+		}
+
+		if isPortOpen(addressToCheck, checkInterval) {
+			log.Printf("Port %s is now open", addressToCheck)
+			break
+		}
+
+		time.Sleep(checkInterval)
+	}
 }
