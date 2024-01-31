@@ -8,6 +8,8 @@ import (
 	"net"
 )
 
+var previousIP string
+
 // Dialer is a struct that holds various options for custom dialing.
 type Dialer struct {
 }
@@ -193,11 +195,12 @@ GENERATE:
 	}
 	ip = net.IPv4(r[0], r[1], r[2], r[3])
 
-	if ip.Equal(ipnet.IP) /*|| ip.Equal(broadcast) */ {
+	if ip.Equal(ipnet.IP) || r[3] == 255 || ip.String() == previousIP {
 		// we got unlucky. The host portion of our ipv4 address was
 		// either all 0s (the network address) or all 1s (the broadcast address)
 		goto GENERATE
 	}
+	previousIP = ip.String()
 	return ip, nil
 }
 

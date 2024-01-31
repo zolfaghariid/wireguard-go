@@ -129,7 +129,7 @@ func resolveIP(ip string) (*net.IPAddr, error) {
 	return net.ResolveIPAddr("ip", ip)
 }
 
-func resolveIPPAndPort(addr string) (string, error) {
+func ResolveIPPAndPort(addr string) (string, error) {
 	if addr == "engage.cloudflareclient.com:2408" {
 		// Define your specific list of port numbers
 		ports := []int{500, 854, 859, 864, 878, 880, 890, 891, 894, 903, 908, 928, 934, 939, 942,
@@ -243,7 +243,7 @@ func ParsePeers(cfg *ini.File, peers *[]PeerConfig, endpoint string) error {
 			if endpoint != "notset" {
 				peer.Endpoint = &endpoint
 			} else {
-				decoded, err = resolveIPPAndPort(strings.ToLower(value))
+				decoded, err = ResolveIPPAndPort(strings.ToLower(value))
 				if err != nil {
 					return err
 				}
