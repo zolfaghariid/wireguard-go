@@ -130,7 +130,7 @@ func runWarpInWarp(bindAddress, endpoint string, verbose bool) {
 		log.Fatal("There are no free udp ports on Device!")
 	}
 
-	err = wiresocks.NewVtunUDPForwarder(virtualEndpointBindAddress, "162.159.195.1:2408", vTUN, mtu)
+	err = wiresocks.NewVtunUDPForwarder(virtualEndpointBindAddress, "162.159.195.1:2408", vTUN, mtu+100)
 	if err != nil {
 		log.Fatal(err)
 	}
