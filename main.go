@@ -169,9 +169,13 @@ func findFreePort(network string) (string, error) {
 
 func createPrimaryAndSecondaryIdentities(license string) {
 	// make primary identity
+	_license := license
+	if _license == "notset" {
+		_license = ""
+	}
 	warp.UpdatePath("./primary")
 	if !warp.CheckProfileExists(license) {
-		err := warp.LoadOrCreateIdentity(license)
+		err := warp.LoadOrCreateIdentity(_license)
 		if err != nil {
 			log.Fatalf("error: %v", err)
 		}
@@ -179,7 +183,7 @@ func createPrimaryAndSecondaryIdentities(license string) {
 	// make secondary
 	warp.UpdatePath("./secondary")
 	if !warp.CheckProfileExists(license) {
-		err := warp.LoadOrCreateIdentity(license)
+		err := warp.LoadOrCreateIdentity(_license)
 		if err != nil {
 			log.Fatalf("error: %v", err)
 		}
