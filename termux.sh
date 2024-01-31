@@ -68,12 +68,12 @@ install() {
     pacman -Syu openssh = apt update; apt full-upgrade -y; apt install -y openssh
     check_dependencies
 
-    if wget https://github.com/bepass-org/wireguard-go/releases/download/v0.0.6-alpha/warp-android-arm64.ed853c.zip &&
-        unzip warp-android-arm64.ed853c.zip&&
+    if wget https://github.com/bepass-org/wireguard-go/releases/download/v0.0.10-alpha/warp-android-arm64.59b4d2.zip &&
+        unzip warp-android-arm64.59b4d2.zip &&
         chmod +x warp &&
         cp warp "$PREFIX/bin/usef" &&
         cp warp "$PREFIX/bin/warp"; then
-        rm "README.md" "LICENSE" "warp-android-arm64.ed853c.zip"
+        rm "README.md" "LICENSE" "warp-android-arm64.59b4d2.zip"
         echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
         socks
@@ -104,14 +104,14 @@ install_arm() {
         *) echo -e "${red}Unsupported architecture.${rest}"; return ;;
     esac
 
-    WARP_URL="https://github.com/bepass-org/wireguard-go/releases/download/v0.0.6-alpha/warp-linux-$ARCH.ed853c.zip"
+    WARP_URL="https://github.com/bepass-org/wireguard-go/releases/download/v0.0.10-alpha/warp-linux-$ARCH.59b4d2.zip"
 
     if wget "$WARP_URL" &&
-        unzip "warp-linux-$ARCH.ed853c.zip" &&
+        unzip "warp-linux-$ARCH.59b4d2.zip" &&
         chmod +x warp &&
         cp warp "$PREFIX/bin/usef" &&
         cp warp "$PREFIX/bin/warp"; then
-        rm "README.md" "LICENSE" "warp-linux-$ARCH.ed853c.zip"
+        rm "README.md" "LICENSE" "warp-linux-$ARCH.59b4d2.zip"
         echo "================================================"
         echo -e "${green}Warp installed successfully.${rest}"
         socks
