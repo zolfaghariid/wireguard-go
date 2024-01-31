@@ -51,7 +51,7 @@ func main() {
 
 	if !*psiphonEnabled && !*gool {
 		// just run primary warp on bindAddress
-		runWarp(*bindAddress, *endpoint, "./primary/wgcf-profile.ini", *verbose, true)
+		runWarp(*bindAddress, *endpoint, "./primary/wgcf-profile.ini", *verbose, true, true)
 	} else if *psiphonEnabled && !*gool {
 		// run primary warp on a random tcp port and run psiphon on bind address
 		runWarpWithPsiphon(*bindAddress, *endpoint, *country, *verbose)
@@ -68,7 +68,7 @@ func main() {
 	}
 }
 
-func runWarp(bindAddress, endpoint, confPath string, verbose, wait bool) {
+func runWarp(bindAddress, endpoint, confPath string, verbose, wait bool, startProxy bool) (*wiresocks.VirtualTun, int) {
 	// Setup channel to listen for interrupt signal (Ctrl+C)
 	var sigChan chan os.Signal
 	if wait {
@@ -86,12 +86,16 @@ func runWarp(bindAddress, endpoint, confPath string, verbose, wait bool) {
 		log.Fatal(err)
 	}
 
-	go tnet.StartProxy(bindAddress)
+	if startProxy {
+		go tnet.StartProxy(bindAddress)
+	}
 
 	// Wait for interrupt signal
 	if wait {
 		<-sigChan
 	}
+
+	return tnet, conf.Device.MTU
 }
 
 func runWarpWithPsiphon(bindAddress, endpoint, country string, verbose bool) {
@@ -101,7 +105,7 @@ func runWarpWithPsiphon(bindAddress, endpoint, country string, verbose bool) {
 		log.Fatal("There are no free tcp ports on Device!")
 	}
 
-	runWarp(warpBindAddress, endpoint, "./primary/wgcf-profile.ini", verbose, false)
+	runWarp(warpBindAddress, endpoint, "./primary/wgcf-profile.ini", verbose, false, true)
 
 	// Setup channel to listen for interrupt signal (Ctrl+C)
 	sigChan := make(chan os.Signal, 1)
@@ -117,17 +121,8 @@ func runWarpWithPsiphon(bindAddress, endpoint, country string, verbose bool) {
 }
 
 func runWarpInWarp(bindAddress, endpoint string, verbose bool) {
-	// make a random bind address for secondary warp
-	warpBindAddress, err := findFreePort("tcp")
-	if err != nil {
-		log.Fatal("There are no free tcp ports on Device!")
-	}
-
 	// run secondary warp
-	runWarp(warpBindAddress, endpoint, "./secondary/wgcf-profile.ini", verbose, false)
-
-	// wait for secondary warp
-	waitForPortToGetsOpenOrTimeout(warpBindAddress)
+	vTUN, mtu := runWarp("", endpoint, "./secondary/wgcf-profile.ini", verbose, false, false)
 
 	// run virtual endpoint
 	virtualEndpointBindAddress, err := findFreePort("udp")
@@ -135,14 +130,13 @@ func runWarpInWarp(bindAddress, endpoint string, verbose bool) {
 		log.Fatal("There are no free udp ports on Device!")
 	}
 
-	f, err := wiresocks.NewSocks5UDPForwarder(virtualEndpointBindAddress, warpBindAddress, "162.159.195.1:2408")
+	err = wiresocks.NewVtunUDPForwarder(virtualEndpointBindAddress, "162.159.195.1:2408", vTUN, mtu)
 	if err != nil {
 		log.Fatal(err)
 	}
-	f.Start()
 
 	// run primary warp
-	runWarp(bindAddress, virtualEndpointBindAddress, "./primary/wgcf-profile.ini", verbose, true)
+	runWarp(bindAddress, virtualEndpointBindAddress, "./primary/wgcf-profile.ini", verbose, true, true)
 }
 
 func findFreePort(network string) (string, error) {

@@ -16,6 +16,50 @@ type Socks5UDPForwarder struct {
 	clientAddr   *net.UDPAddr
 }
 
+func NewVtunUDPForwarder(localBind, dest string, vtun *VirtualTun, mtu int) error {
+	localAddr, err := net.ResolveUDPAddr("udp", localBind)
+	if err != nil {
+		return err
+	}
+
+	listener, err := net.ListenUDP("udp", localAddr)
+	if err != nil {
+		return err
+	}
+
+	rconn, err := vtun.Tnet.Dial("udp", dest)
+	if err != nil {
+		return err
+	}
+
+	var remoteAddr *net.UDPAddr
+	go func() {
+		buffer := make([]byte, mtu)
+		oob := make([]byte, mtu)
+		n := 0
+		for {
+			n, _, _, remoteAddr, err = listener.ReadMsgUDP(buffer, oob)
+			if err != nil {
+				continue
+			}
+
+			rconn.Write(buffer[:n])
+		}
+	}()
+	go func() {
+		buffer := make([]byte, mtu)
+		for {
+			n, err := rconn.Read(buffer)
+			if err != nil {
+				fmt.Println("Error reading from connection:", err)
+				continue
+			}
+			listener.WriteMsgUDP(buffer[:n], nil, remoteAddr)
+		}
+	}()
+	return nil
+}
+
 func NewSocks5UDPForwarder(localBind, socks5Server, dest string) (*Socks5UDPForwarder, error) {
 	localAddr, err := net.ResolveUDPAddr("udp", localBind)
 	if err != nil {
