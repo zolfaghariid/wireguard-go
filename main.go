@@ -129,8 +129,8 @@ func runWarpInWarp(bindAddress, endpoint string, verbose bool) {
 	if err != nil {
 		log.Fatal("There are no free udp ports on Device!")
 	}
-
-	err = wiresocks.NewVtunUDPForwarder(virtualEndpointBindAddress, "162.159.195.1:2408", vTUN, mtu+100)
+	addr, _ := wiresocks.ResolveIPPAndPort("engage.cloudflareclient.com:2408")
+	err = wiresocks.NewVtunUDPForwarder(virtualEndpointBindAddress, addr, vTUN, mtu+100)
 	if err != nil {
 		log.Fatal(err)
 	}
