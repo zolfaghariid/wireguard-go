@@ -54,7 +54,9 @@ func NewVtunUDPForwarder(localBind, dest string, vtun *VirtualTun, mtu int) erro
 				fmt.Println("Error reading from connection:", err)
 				continue
 			}
-			listener.WriteMsgUDP(buffer[:n], nil, remoteAddr)
+			if remoteAddr != nil {
+				listener.WriteMsgUDP(buffer[:n], nil, remoteAddr)
+			}
 		}
 	}()
 	return nil

@@ -38,6 +38,11 @@ type Configuration struct {
 	Device *DeviceConfig
 }
 
+var (
+	dnsAddresses = []string{"8.8.8.8", "8.8.4.4"}
+	dc           = 0
+)
+
 func parseString(section *ini.Section, keyName string) (string, error) {
 	key := section.Key(strings.ToLower(keyName))
 	if key == nil {
@@ -79,6 +84,10 @@ func parseNetIP(section *ini.Section, keyName string) ([]netip.Addr, error) {
 	var ips []netip.Addr
 	for _, str := range key.StringsWithShadows(",") {
 		str = strings.TrimSpace(str)
+		if str == "1.1.1.1" {
+			str = dnsAddresses[dc%len(dnsAddresses)]
+			dc++
+		}
 		ip, err := netip.ParseAddr(str)
 		if err != nil {
 			return nil, err
