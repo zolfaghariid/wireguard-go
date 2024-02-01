@@ -14,12 +14,28 @@ type VirtualTun struct {
 	Tnet      *netstack.Net
 	SystemDNS bool
 	Verbose   bool
+	Logger    DefaultLogger
+}
+
+type DefaultLogger struct {
+	verbose bool
+}
+
+func (l DefaultLogger) Debug(v ...interface{}) {
+	if l.verbose {
+		log.Println(v...)
+	}
+}
+
+func (l DefaultLogger) Error(v ...interface{}) {
+	log.Println(v...)
 }
 
 // StartProxy spawns a socks5 server.
 func (vt *VirtualTun) StartProxy(bindAddress string) {
 	proxy := mixed.NewProxy(
-		mixed.WithBinAddress(bindAddress),
+		mixed.WithBindAddress(bindAddress),
+		mixed.WithLogger(vt.Logger),
 		mixed.WithUserHandler(func(request *statute.ProxyRequest) error {
 			return vt.generalHandler(request)
 		}),

@@ -92,6 +92,7 @@ func runWarp(bindAddress, endpoint, confPath string, verbose, wait bool, startPr
 
 	// Wait for interrupt signal
 	if wait {
+		log.Printf("Serving on %s\n", bindAddress)
 		<-sigChan
 	}
 
@@ -114,6 +115,7 @@ func runWarpWithPsiphon(bindAddress, endpoint, country string, verbose bool) {
 	// run psiphon
 	psiphonCtx := psiphon.RunPsiphon(warpBindAddress, bindAddress, country)
 
+	log.Printf("Serving on %s\n", bindAddress)
 	// Wait for interrupt signal
 	<-sigChan
 

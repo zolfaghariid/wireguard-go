@@ -90,5 +90,8 @@ func StartWireguard(conf *DeviceConfig, verbose bool) (*VirtualTun, error) {
 		Tnet:      tnet,
 		SystemDNS: len(setting.dns) == 0,
 		Verbose:   verbose,
+		Logger: DefaultLogger{
+			verbose: verbose,
+		},
 	}, nil
 }

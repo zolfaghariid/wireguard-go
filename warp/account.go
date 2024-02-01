@@ -26,6 +26,8 @@ const (
 var (
 	identityFile = "wgcf-identity.json"
 	profileFile  = "wgcf-profile.ini"
+	dnsAddresses = []string{"8.8.8.8", "8.8.4.4"}
+	dc           = 0
 )
 
 var defaultHeaders = makeDefaultHeaders()
@@ -470,7 +472,8 @@ func getWireguardConfig(privateKey, address1, address2, publicKey, endpoint stri
 
 	buffer.WriteString("[Interface]\n")
 	buffer.WriteString(fmt.Sprintf("PrivateKey = %s\n", privateKey))
-	buffer.WriteString("DNS = 1.1.1.1\n")
+	buffer.WriteString(fmt.Sprintf("DNS = %s\n", dnsAddresses[dc%len(dnsAddresses)]))
+	dc++
 	buffer.WriteString(fmt.Sprintf("Address = %s\n", address1+"/24"))
 	buffer.WriteString(fmt.Sprintf("Address = %s\n", address2+"/128"))
 
