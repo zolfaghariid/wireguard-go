@@ -29,6 +29,7 @@ func main() {
 		country        = flag.String("country", "", "psiphon country code in ISO 3166-1 alpha-2 format")
 		psiphonEnabled = flag.Bool("cfon", false, "enable psiphonEnabled over warp")
 		gool           = flag.Bool("gool", false, "enable warp gooling")
+		scan           = flag.Bool("scan", false, "enable warp scanner(experimental)")
 	)
 
 	flag.Usage = usage
@@ -48,16 +49,21 @@ func main() {
 	createPrimaryAndSecondaryIdentities(*license)
 
 	//Decide Working Scenario
+	endpoints := []string{*endpoint, *endpoint}
+
+	if *scan {
+		endpoints = wiresocks.RunScan()
+	}
 
 	if !*psiphonEnabled && !*gool {
 		// just run primary warp on bindAddress
-		runWarp(*bindAddress, *endpoint, "./primary/wgcf-profile.ini", *verbose, true, true)
+		runWarp(*bindAddress, endpoints, "./primary/wgcf-profile.ini", *verbose, true, true)
 	} else if *psiphonEnabled && !*gool {
 		// run primary warp on a random tcp port and run psiphon on bind address
-		runWarpWithPsiphon(*bindAddress, *endpoint, *country, *verbose)
+		runWarpWithPsiphon(*bindAddress, endpoints, *country, *verbose)
 	} else if !*psiphonEnabled && *gool {
 		// run warp in warp
-		runWarpInWarp(*bindAddress, *endpoint, *verbose)
+		runWarpInWarp(*bindAddress, endpoints, *verbose)
 	}
 
 	//End Decide Working Scenario
@@ -68,7 +74,7 @@ func main() {
 	}
 }
 
-func runWarp(bindAddress, endpoint, confPath string, verbose, wait bool, startProxy bool) (*wiresocks.VirtualTun, int) {
+func runWarp(bindAddress string, endpoints []string, confPath string, verbose, wait bool, startProxy bool) (*wiresocks.VirtualTun, int) {
 	// Setup channel to listen for interrupt signal (Ctrl+C)
 	var sigChan chan os.Signal
 	if wait {
@@ -76,7 +82,7 @@ func runWarp(bindAddress, endpoint, confPath string, verbose, wait bool, startPr
 		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	}
 
-	conf, err := wiresocks.ParseConfig(confPath, endpoint)
+	conf, err := wiresocks.ParseConfig(confPath, endpoints[0])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -99,14 +105,14 @@ func runWarp(bindAddress, endpoint, confPath string, verbose, wait bool, startPr
 	return tnet, conf.Device.MTU
 }
 
-func runWarpWithPsiphon(bindAddress, endpoint, country string, verbose bool) {
+func runWarpWithPsiphon(bindAddress string, endpoints []string, country string, verbose bool) {
 	// make a random bind address for warp
 	warpBindAddress, err := findFreePort("tcp")
 	if err != nil {
 		log.Fatal("There are no free tcp ports on Device!")
 	}
 
-	runWarp(warpBindAddress, endpoint, "./primary/wgcf-profile.ini", verbose, false, true)
+	runWarp(warpBindAddress, endpoints, "./primary/wgcf-profile.ini", verbose, false, true)
 
 	// Setup channel to listen for interrupt signal (Ctrl+C)
 	sigChan := make(chan os.Signal, 1)
@@ -122,23 +128,26 @@ func runWarpWithPsiphon(bindAddress, endpoint, country string, verbose bool) {
 	psiphonCtx.Done()
 }
 
-func runWarpInWarp(bindAddress, endpoint string, verbose bool) {
+func runWarpInWarp(bindAddress string, endpoints []string, verbose bool) {
 	// run secondary warp
-	vTUN, mtu := runWarp("", endpoint, "./secondary/wgcf-profile.ini", verbose, false, false)
+	vTUN, mtu := runWarp("", endpoints, "./secondary/wgcf-profile.ini", verbose, false, false)
 
 	// run virtual endpoint
 	virtualEndpointBindAddress, err := findFreePort("udp")
 	if err != nil {
 		log.Fatal("There are no free udp ports on Device!")
 	}
-	addr, _ := wiresocks.ResolveIPPAndPort("engage.cloudflareclient.com:2408")
+	addr := endpoints[1]
+	if addr == "notset" {
+		addr, _ = wiresocks.ResolveIPPAndPort("engage.cloudflareclient.com:2408")
+	}
 	err = wiresocks.NewVtunUDPForwarder(virtualEndpointBindAddress, addr, vTUN, mtu+100)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// run primary warp
-	runWarp(bindAddress, virtualEndpointBindAddress, "./primary/wgcf-profile.ini", verbose, true, true)
+	runWarp(bindAddress, []string{virtualEndpointBindAddress}, "./primary/wgcf-profile.ini", verbose, true, true)
 }
 
 func findFreePort(network string) (string, error) {
