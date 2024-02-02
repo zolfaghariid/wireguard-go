@@ -53,6 +53,8 @@ func main() {
 
 	if *scan {
 		endpoints = wiresocks.RunScan()
+		log.Println("Cooling down please wait 5 seconds...")
+		time.Sleep(5 * time.Second)
 	}
 
 	if !*psiphonEnabled && !*gool {

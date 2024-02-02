@@ -59,7 +59,7 @@ func RunScan() (result []string) {
 	var ipList []net.IP
 	for {
 		ipList = scanner.GetAvailableIPS()
-		if len(ipList) > 2 {
+		if len(ipList) > 1 {
 			scanner.Stop()
 			break
 		}
