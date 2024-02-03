@@ -22,40 +22,44 @@ func NewVtunUDPForwarder(localBind, dest string, vtun *VirtualTun, mtu int) erro
 		return err
 	}
 
+	destAddr, err := net.ResolveUDPAddr("udp", dest)
+	if err != nil {
+		return err
+	}
+
 	listener, err := net.ListenUDP("udp", localAddr)
 	if err != nil {
 		return err
 	}
 
-	rconn, err := vtun.Tnet.Dial("udp", dest)
+	rconn, err := vtun.Tnet.DialUDP(nil, destAddr)
 	if err != nil {
 		return err
 	}
 
-	var remoteAddr *net.UDPAddr
+	var clientAddr *net.UDPAddr
 	go func() {
 		buffer := make([]byte, mtu)
-		oob := make([]byte, mtu)
-		n := 0
 		for {
-			n, _, _, remoteAddr, err = listener.ReadMsgUDP(buffer, oob)
+			n, cAddr, err := listener.ReadFrom(buffer)
 			if err != nil {
 				continue
 			}
 
-			rconn.Write(buffer[:n])
+			clientAddr = cAddr.(*net.UDPAddr)
+
+			rconn.WriteTo(buffer[:n], destAddr)
 		}
 	}()
 	go func() {
 		buffer := make([]byte, mtu)
 		for {
-			n, err := rconn.Read(buffer)
+			n, _, err := rconn.ReadFrom(buffer)
 			if err != nil {
-				fmt.Println("Error reading from connection:", err)
 				continue
 			}
-			if remoteAddr != nil {
-				listener.WriteMsgUDP(buffer[:n], nil, remoteAddr)
+			if clientAddr != nil {
+				listener.WriteTo(buffer[:n], clientAddr)
 			}
 		}
 	}()
