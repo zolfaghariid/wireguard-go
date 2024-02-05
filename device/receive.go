@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/uoosef/wireguard-go/conn"
+	"github.com/bepass-org/wireguard-go/conn"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"

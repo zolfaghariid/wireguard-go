@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/bepass-org/proxy/pkg/mixed"
 	"github.com/bepass-org/proxy/pkg/statute"
-	"github.com/uoosef/wireguard-go/tun/netstack"
+	"github.com/bepass-org/wireguard-go/tun/netstack"
 	"io"
 	"log"
 )
