@@ -522,7 +522,7 @@ func LoadOrCreateIdentity(license string) error {
 		fmt.Println("Creating new identity...")
 		accountData, err = doRegister()
 		if err != nil {
-			return nil
+			return err
 		}
 		accountData.LicenseKey = license
 		saveIdentity(accountData, identityFile)
