@@ -7,7 +7,7 @@ replace github.com/Psiphon-Labs/psiphon-tunnel-core => github.com/uoosef/psiphon
 require (
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
 	github.com/Psiphon-Labs/psiphon-tunnel-core v0.0.0-00010101000000-000000000000
-	github.com/bepass-org/ipscanner v0.0.0-20240202184838-2a4a13151bb1
+	github.com/bepass-org/ipscanner v0.0.0-20240205155121-8927b7437d16
 	github.com/bepass-org/proxy v0.0.0-20240201095508-c86216dd0aea
 	github.com/go-ini/ini v1.67.0
 	github.com/refraction-networking/conjure v0.7.10-0.20231110193225-e4749a9dedc9
