@@ -5,7 +5,7 @@
 
 package device
 
-import "github.com/uoosef/wireguard-go/conn"
+import "github.com/bepass-org/wireguard-go/conn"
 
 /* Reduce memory consumption for Android */
 

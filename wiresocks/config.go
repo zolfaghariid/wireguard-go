@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/uoosef/wireguard-go/warp"
+	"github.com/bepass-org/wireguard-go/warp"
 	"math/rand"
 	"net"
 	"strings"
