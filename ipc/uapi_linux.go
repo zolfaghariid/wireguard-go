@@ -9,7 +9,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/uoosef/wireguard-go/rwcancel"
+	"github.com/bepass-org/wireguard-go/rwcancel"
 	"golang.org/x/sys/unix"
 )
 

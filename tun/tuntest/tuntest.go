@@ -11,7 +11,7 @@ import (
 	"net/netip"
 	"os"
 
-	"github.com/uoosef/wireguard-go/tun"
+	"github.com/bepass-org/wireguard-go/tun"
 )
 
 func Ping(dst, src netip.Addr) []byte {

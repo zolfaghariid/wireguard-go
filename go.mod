@@ -1,4 +1,4 @@
-module github.com/uoosef/wireguard-go
+module github.com/bepass-org/wireguard-go
 
 go 1.20
 

@@ -114,21 +114,24 @@ func getTimestamp() string {
 	return timestamp
 }
 
-func genKeyPair() (privateKey string, publicKey string) {
+func genKeyPair() (string, string, error) {
 	// Generate private key
 	priv, err := GeneratePrivateKey()
 	if err != nil {
 		fmt.Println("Error generating private key:", err)
-		os.Exit(1)
+		return "", "", err
 	}
-	privateKey = priv.String()
-	publicKey = priv.PublicKey().String()
-	return
+	privateKey := priv.String()
+	publicKey := priv.PublicKey().String()
+	return privateKey, publicKey, nil
 }
 
-func doRegister() *AccountData {
+func doRegister() (*AccountData, error) {
 	timestamp := getTimestamp()
-	privateKey, publicKey := genKeyPair()
+	privateKey, publicKey, err := genKeyPair()
+	if err != nil {
+		return nil, err
+	}
 	data := map[string]interface{}{
 		"install_id": "",
 		"fcm_token":  "",
@@ -145,7 +148,10 @@ func doRegister() *AccountData {
 
 	jsonBody, _ := json.Marshal(data)
 
-	req, _ := http.NewRequest("POST", regURL, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", regURL, bytes.NewBuffer(jsonBody))
+	if err != nil {
+		return nil, err
+	}
 
 	// Set headers
 	for k, v := range MergeMaps(defaultHeaders, headers) {
@@ -156,14 +162,14 @@ func doRegister() *AccountData {
 	response, err := client.Do(req)
 	if err != nil {
 		fmt.Println("sending request to remote server", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	// convert response to byte array
 	responseData, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("reading response body", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	var rspData interface{}
@@ -171,7 +177,7 @@ func doRegister() *AccountData {
 	err = json.Unmarshal(responseData, &rspData)
 	if err != nil {
 		fmt.Println("Error:", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	m := rspData.(map[string]interface{})
@@ -181,14 +187,14 @@ func doRegister() *AccountData {
 		AccessToken: m["token"].(string),
 		PrivateKey:  privateKey,
 		LicenseKey:  m["account"].(map[string]interface{})["license"].(string),
-	}
+	}, nil
 }
 
-func saveIdentity(accountData *AccountData, identityPath string) {
+func saveIdentity(accountData *AccountData, identityPath string) error {
 	file, err := os.Create(identityPath)
 	if err != nil {
 		fmt.Println("Error:", err)
-		os.Exit(1)
+		return err
 	}
 
 	encoder := json.NewEncoder(file)
@@ -196,36 +202,36 @@ func saveIdentity(accountData *AccountData, identityPath string) {
 	err = encoder.Encode(accountData)
 	if err != nil {
 		fmt.Println("Error:", err)
-		os.Exit(1)
+		return err
 	}
 
-	_ = file.Close()
+	return file.Close()
 }
 
-func loadIdentity(identityPath string) *AccountData {
+func loadIdentity(identityPath string) (accountData *AccountData, err error) {
 	file, err := os.Open(identityPath)
 	if err != nil {
 		fmt.Println("Error:", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	defer func(file *os.File) {
-		err := file.Close()
+		err = file.Close()
 		if err != nil {
 			fmt.Println("Error:", err)
-			os.Exit(1)
 		}
+		return
 	}(file)
 
-	accountData := AccountData{}
+	accountData = &AccountData{}
 	decoder := json.NewDecoder(file)
 	err = decoder.Decode(&accountData)
 	if err != nil {
 		fmt.Println("Error:", err)
-		os.Exit(1)
+		return nil, err
 	}
 
-	return &accountData
+	return accountData, nil
 }
 
 func enableWarp(accountData *AccountData) error {
@@ -237,7 +243,10 @@ func enableWarp(accountData *AccountData) error {
 
 	url := getConfigURL(accountData.AccountID)
 
-	req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
 
 	// Set headers
 	headers := map[string]string{
@@ -274,7 +283,10 @@ func enableWarp(accountData *AccountData) error {
 
 func getServerConf(accountData *AccountData) (*ConfigurationData, error) {
 
-	req, _ := http.NewRequest("GET", getConfigURL(accountData.AccountID), nil)
+	req, err := http.NewRequest("GET", getConfigURL(accountData.AccountID), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	// Set headers
 	headers := map[string]string{
@@ -347,7 +359,10 @@ func updateLicenseKey(accountData *AccountData, confData *ConfigurationData) (bo
 
 		url := getAccountURL(accountData.AccountID)
 
-		req, _ := http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
+		req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
+		if err != nil {
+			return false, err
+		}
 
 		// Set headers
 		headers := map[string]string{
@@ -387,7 +402,10 @@ func updateLicenseKey(accountData *AccountData, confData *ConfigurationData) (bo
 
 func getDeviceActive(accountData *AccountData) (bool, error) {
 
-	req, _ := http.NewRequest("GET", getDevicesURL(accountData.AccountID), nil)
+	req, err := http.NewRequest("GET", getDevicesURL(accountData.AccountID), nil)
+	if err != nil {
+		return false, err
+	}
 
 	// Set headers
 	headers := map[string]string{
@@ -432,7 +450,10 @@ func setDeviceActive(accountData *AccountData, status bool) (bool, error) {
 
 	url := getAccountRegURL(accountData.AccountID, accountData.AccountID)
 
-	req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return false, err
+	}
 
 	// Set headers
 	headers := map[string]string{
@@ -499,12 +520,18 @@ func LoadOrCreateIdentity(license string) error {
 
 	if _, err := os.Stat(identityFile); os.IsNotExist(err) {
 		fmt.Println("Creating new identity...")
-		accountData = doRegister()
+		accountData, err = doRegister()
+		if err != nil {
+			return err
+		}
 		accountData.LicenseKey = license
 		saveIdentity(accountData, identityFile)
 	} else {
 		fmt.Println("Loading existing identity...")
-		accountData = loadIdentity(identityFile)
+		accountData, err = loadIdentity(identityFile)
+		if err != nil {
+			return err
+		}
 	}
 
 	fmt.Println("Getting configuration...")
