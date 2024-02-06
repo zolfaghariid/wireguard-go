@@ -7,6 +7,7 @@ import (
 	"github.com/go-ini/ini"
 	"log"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -85,5 +86,10 @@ func ipToAddress(ip net.IP) string {
 	} else if err != nil {
 		panic(err)
 	}
-	return fmt.Sprintf("%s:%d", ip.String(), ports[int(b[0])%len(ports)])
+	serverAddress := fmt.Sprintf("%s:%d", ip.String(), ports[int(b[0])%len(ports)])
+	if strings.Contains(ip.String(), ":") {
+		//ip6
+		serverAddress = fmt.Sprintf("[%s]:%d", ip.String(), ports[int(b[0])%len(ports)])
+	}
+	return serverAddress
 }
