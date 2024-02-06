@@ -35,8 +35,12 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
+	RunWarp(*psiphonEnabled, *gool, *scan, *verbose, *country, *bindAddress, *endpoint, *license)
+}
+
+func RunWarp(psiphonEnabled, gool, scan, verbose bool, country, bindAddress, endpoint, license string) {
 	// check if user input is not correct
-	if (*psiphonEnabled && *gool) || (!*psiphonEnabled && *country != "") {
+	if (psiphonEnabled && gool) || (!psiphonEnabled && country != "") {
 		log.Println("Wrong command!")
 		flag.Usage()
 		return
@@ -46,26 +50,26 @@ func main() {
 	makeDirs()
 
 	//create identities
-	createPrimaryAndSecondaryIdentities(*license)
+	createPrimaryAndSecondaryIdentities(license)
 
 	//Decide Working Scenario
-	endpoints := []string{*endpoint, *endpoint}
+	endpoints := []string{endpoint, endpoint}
 
-	if *scan {
+	if scan {
 		endpoints = wiresocks.RunScan()
 		log.Println("Cooling down please wait 5 seconds...")
 		time.Sleep(5 * time.Second)
 	}
 
-	if !*psiphonEnabled && !*gool {
+	if !psiphonEnabled && !gool {
 		// just run primary warp on bindAddress
-		runWarp(*bindAddress, endpoints, "./primary/wgcf-profile.ini", *verbose, true, true)
-	} else if *psiphonEnabled && !*gool {
+		runWarp(bindAddress, endpoints, "./primary/wgcf-profile.ini", verbose, true, true)
+	} else if psiphonEnabled && !gool {
 		// run primary warp on a random tcp port and run psiphon on bind address
-		runWarpWithPsiphon(*bindAddress, endpoints, *country, *verbose)
-	} else if !*psiphonEnabled && *gool {
+		runWarpWithPsiphon(bindAddress, endpoints, country, verbose)
+	} else if !psiphonEnabled && gool {
 		// run warp in warp
-		runWarpInWarp(*bindAddress, endpoints, *verbose)
+		runWarpInWarp(bindAddress, endpoints, verbose)
 	}
 
 	//End Decide Working Scenario
