@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func usage() {
@@ -32,7 +33,7 @@ func main() {
 
 	sigchan := make(chan os.Signal)
 	signal.Notify(sigchan, os.Interrupt, syscall.SIGTERM)
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
 		err := app.RunWarp(*psiphonEnabled, *gool, *scan, *verbose, *country, *bindAddress, *endpoint, *license, ctx)
@@ -42,5 +43,6 @@ func main() {
 	}()
 
 	<-sigchan
-	ctx.Done()
+	cancel()
+	time.Sleep(10 * time.Second)
 }

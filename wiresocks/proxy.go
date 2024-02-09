@@ -9,6 +9,7 @@ import (
 	"github.com/bepass-org/wireguard-go/tun/netstack"
 	"io"
 	"log"
+	"time"
 )
 
 // VirtualTun stores a reference to netstack network and DNS configuration
@@ -47,6 +48,17 @@ func (vt *VirtualTun) StartProxy(bindAddress string) {
 	)
 	go func() {
 		_ = proxy.ListenAndServe()
+	}()
+	go func() {
+		for {
+			select {
+			case <-vt.Ctx.Done():
+				vt.Stop()
+				return
+			default:
+				time.Sleep(500 * time.Millisecond)
+			}
+		}
 	}()
 }
 
@@ -87,10 +99,10 @@ func (vt *VirtualTun) generalHandler(req *statute.ProxyRequest) error {
 }
 
 func (vt *VirtualTun) Stop() {
-	if vt.Ctx != nil {
-		vt.Ctx.Done()
-	}
 	if vt.Dev != nil {
-		vt.Dev.Close()
+		err := vt.Dev.Down()
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }

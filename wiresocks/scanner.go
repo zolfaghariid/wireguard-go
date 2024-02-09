@@ -25,7 +25,7 @@ func canConnectIPv6(remoteAddr string) bool {
 	return true
 }
 
-func RunScan(ctx context.Context) (result []string, err error) {
+func RunScan(ctx *context.Context) (result []string, err error) {
 	cfg, err := ini.Load("./primary/wgcf-profile.ini")
 	if err != nil {
 		log.Printf("Failed to read file: %v", err)
@@ -64,7 +64,7 @@ func RunScan(ctx context.Context) (result []string, err error) {
 
 	for {
 		select {
-		case <-ctx.Done():
+		case <-(*ctx).Done():
 			// Context is done - canceled externally
 			scanner.Stop()
 			return nil, fmt.Errorf("user canceled the operation")

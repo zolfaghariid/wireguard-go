@@ -51,7 +51,7 @@ func RunWarp(psiphonEnabled, gool, scan, verbose bool, country, bindAddress, end
 
 	if scan {
 		var err error
-		endpoints, err = wiresocks.RunScan(ctx)
+		endpoints, err = wiresocks.RunScan(&ctx)
 		if err != nil {
 			return err
 		}
