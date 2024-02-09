@@ -1,9 +1,11 @@
 package wiresocks
 
 import (
+	"context"
 	"fmt"
 	"github.com/bepass-org/proxy/pkg/mixed"
 	"github.com/bepass-org/proxy/pkg/statute"
+	"github.com/bepass-org/wireguard-go/device"
 	"github.com/bepass-org/wireguard-go/tun/netstack"
 	"io"
 	"log"
@@ -15,6 +17,8 @@ type VirtualTun struct {
 	SystemDNS bool
 	Verbose   bool
 	Logger    DefaultLogger
+	Dev       *device.Device
+	Ctx       context.Context
 }
 
 type DefaultLogger struct {
@@ -36,11 +40,14 @@ func (vt *VirtualTun) StartProxy(bindAddress string) {
 	proxy := mixed.NewProxy(
 		mixed.WithBindAddress(bindAddress),
 		mixed.WithLogger(vt.Logger),
+		mixed.WithContext(vt.Ctx),
 		mixed.WithUserHandler(func(request *statute.ProxyRequest) error {
 			return vt.generalHandler(request)
 		}),
 	)
-	_ = proxy.ListenAndServe()
+	go func() {
+		_ = proxy.ListenAndServe()
+	}()
 }
 
 func (vt *VirtualTun) generalHandler(req *statute.ProxyRequest) error {
@@ -77,4 +84,13 @@ func (vt *VirtualTun) generalHandler(req *statute.ProxyRequest) error {
 	<-done
 
 	return nil
+}
+
+func (vt *VirtualTun) Stop() {
+	if vt.Ctx != nil {
+		vt.Ctx.Done()
+	}
+	if vt.Dev != nil {
+		vt.Dev.Close()
+	}
 }
