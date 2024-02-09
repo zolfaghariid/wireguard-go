@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 func usage() {
@@ -44,5 +43,4 @@ func main() {
 
 	<-sigchan
 	cancel()
-	time.Sleep(10 * time.Second)
 }
